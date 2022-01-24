@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gazetteer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+    <style>
+        #map { 
+            height: 90vh;
+            width: 100% 
+        }
+        .leaflet-left .leaflet-control {
+            margin-top: 100px;
+        }
+        #banner {
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ddd;
+            position: absolute;
+            z-index: 999;
+            height: 10vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-around
+        }
+        #countrySelection{
+            display: flex;
+        }
+    </style>
+</head>
+    <body>
+        <div id="banner">
+            <select id="countrySelection"></select>
+            <button id="btn">Press me</button>
+        </div>
+        <div id="map"></div>
+        
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+    
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        var  Esri_WorldStreetMap = 
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+            })
+            .addTo(map);
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="libs/js/script.js" type="text/javascript"></script>
+    
+</body>
+</html>
