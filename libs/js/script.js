@@ -135,7 +135,7 @@ $(function(){
 const countryPainter = (countryToFind) => {
 
     $.ajax({
-        url: "libs/php/getCountrypolygon.php",
+        url: "libs/php/getCountryPolygon.php",
         type: 'POST',
         dataType: 'json',
         data: {
