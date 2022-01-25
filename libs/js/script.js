@@ -1,23 +1,21 @@
 
-// navigator.geolocation.getCurrentPosition((results)=>{
-//     ({ latitude, longitude} = results.coords)
-//     console.log(latitude, longitude)
-// })
-
 // create map
 
 var map = L.map('map').setView([51.505, -0.09], 2);
-        var  Esri_WorldStreetMap = 
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-            })
-            .addTo(map);
+var Esri_WorldStreetMap = 
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    })
+    .addTo(map);
 
+
+var marker = L.marker([51.5, -0.09]).addTo(map); //testing markers
 
 
 $(function(){
     // get users lat and long from browser
     navigator.geolocation.getCurrentPosition((results)=>{
+
         // Grab and reassign variable names
         ({ latitude: userLatitude, longitude: userLongitude } = results.coords)
         console.log(userLatitude, userLongitude)
@@ -38,7 +36,8 @@ $(function(){
                 if (result.status.name == "ok") {
                     let countryCode = result.data[0].properties.components["ISO_3166-1_alpha-2"];
                     countryPainter(countryCode);
-                    map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true)
+                    map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true) //fly to users location
+                    var marker = L.marker([userLatitude, userLongitude]).addTo(map);
                 }
             
             },
@@ -47,8 +46,6 @@ $(function(){
             }
         }); 
     })
-
-    // find country user is in using lat and long
 
     // Onload drop down creation
     $.ajax({
@@ -88,11 +85,10 @@ $(function(){
         }
     });
 
-    // get country polygon
-
+    // drop down menu border creation
     $("#countrySelection").on("change", ()=>{
         
-        countryPainter($('#countrySelection').val());
+        countryPainter($('#countrySelection').val()); //grabs the country iso and creates border
         
     });
 
@@ -111,6 +107,8 @@ $(function(){
                 
 
 				if (result.status.name == "ok") {
+                    // remove any markers
+                    // map.removeLayer(marker)
                     countryData = result.data[0]
                     console.log([countryData.latlng[0], countryData.latlng[1]])
                     //change map view to country general location
@@ -127,40 +125,13 @@ $(function(){
 
 
 
-}) // end of document function
+}) // end of function
 
 
-// AJAX template
-// $.ajax({
-//     url: "libs/php/getCountryInfo.php",
-//     type: 'POST',
-//     dataType: 'json',
-//     data: {
-//         country: $('#selCountry').val(),
-//         lang: $('#selLanguage').val()
-//     },
-//     success: function(result) {
 
-//         console.log(JSON.stringify(result));
+// global functions:
 
-//         if (result.status.name == "ok") {
-
-//             $('#txtContinent').html(result['data'][0]['continent']);
-//             $('#txtCapital').html(result['data'][0]['capital']);
-//             $('#txtLanguages').html(result['data'][0]['languages']);
-//             $('#txtPopulation').html(result['data'][0]['population']);
-//             $('#txtArea').html(result['data'][0]['areaInSqKm']);
-
-//         }
-    
-//     },
-//     error: function(jqXHR, textStatus, errorThrown) {
-//         // your error code
-//     }
-// }); 
-
-
-// gobal functions
+// create country borders
 const countryPainter = (countryToFind) => {
 
     $.ajax({
@@ -177,7 +148,7 @@ const countryPainter = (countryToFind) => {
                 countries = result.data
                 index = 0;
                 if($(".leaflet-interactive")){
-                    $(".leaflet-interactive").remove();
+                    $(".leaflet-interactive").remove(); //removes old border
                 }
                 for(let i=0; i < countries.features.length; i++){
                     if(countries.features[i].properties.iso_a2 === countryToFind) {
