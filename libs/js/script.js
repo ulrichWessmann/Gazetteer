@@ -1,3 +1,9 @@
+
+// navigator.geolocation.getCurrentPosition((results)=>{
+//     ({ latitude, longitude} = results.coords)
+//     console.log(latitude, longitude)
+// })
+
 // create map
 
 var map = L.map('map').setView([51.505, -0.09], 2);
@@ -7,15 +13,43 @@ var map = L.map('map').setView([51.505, -0.09], 2);
             })
             .addTo(map);
 
-let geojsonFeature;
-let polygon;
-const myStyle = {
-    "color": "#f00",
-    "weight": 5,
-    "opacity": 0.65
-};
+
 
 $(function(){
+    // get users lat and long from browser
+    navigator.geolocation.getCurrentPosition((results)=>{
+        // Grab and reassign variable names
+        ({ latitude: userLatitude, longitude: userLongitude } = results.coords)
+        console.log(userLatitude, userLongitude)
+
+        // get country name from lat long
+        $.ajax({
+            url: "libs/php/getOpenCageByLatLng.php",
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                lat: userLatitude,
+                lng: userLongitude
+            },
+            success: function(result) {
+
+                // console.log(JSON.stringify(result));
+
+                if (result.status.name == "ok") {
+                    let countryCode = result.data[0].properties.components["ISO_3166-1_alpha-2"];
+                    countryPainter(countryCode);
+                    map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true)
+                }
+            
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // your error code
+            }
+        }); 
+    })
+
+    // find country user is in using lat and long
+
     // Onload drop down creation
     $.ajax({
         url: "libs/php/getCountryNames.php",
@@ -57,48 +91,15 @@ $(function(){
     // get country polygon
 
     $("#countrySelection").on("change", ()=>{
-        $.ajax({
-			url: "libs/php/getCountrypolygon.php",
-			type: 'POST',
-			dataType: 'json',
-			data: {
-				country: $('#countrySelection').val()
-			},
-			success: function(result) {
-                console.log(result)
-
-				if (result.status.name == "ok") {
-                    countries = result.data
-                    index = 0;
-                    if($(".leaflet-interactive")){
-                        $(".leaflet-interactive").remove();
-                    }
-                    for(let i=0; i < countries.features.length; i++){
-                        if(countries.features[i].properties.iso_a2 === $('#countrySelection').val()) {
-                            index = i;
-                        }
-                    }
-                    
-                    L.geoJSON(countries.features[index], {
-                        style:  {
-                            "color": "#ff7800",
-                            "weight": 5,
-                            "opacity": 0.65
-                        }
-                    }).addTo(map);
-				}
-			
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				// your error code
-			}
-		}); 
+        
+        countryPainter($('#countrySelection').val());
         
     });
 
     $("#countrySelection").on("change", ()=> {
+        // get countries lat and from from country code
         $.ajax({
-			url: "libs/php/getOpenCageInfo.php",
+			url: "libs/php/getRestCountries.php",
 			type: 'POST',
 			dataType: 'json',
 			data: {
@@ -106,11 +107,14 @@ $(function(){
 			},
 			success: function(result) {
 
-				console.log(JSON.stringify(result));
+				console.log((result));
+                
 
 				if (result.status.name == "ok") {
-
-					
+                    countryData = result.data[0]
+                    console.log([countryData.latlng[0], countryData.latlng[1]])
+                    //change map view to country general location
+					map.flyTo([countryData.latlng[0], countryData.latlng[1]], 5, true)
 
 				}
 			
@@ -120,6 +124,8 @@ $(function(){
 			}
 		}); 
     });
+
+
 
 }) // end of document function
 
@@ -152,3 +158,47 @@ $(function(){
 //         // your error code
 //     }
 // }); 
+
+
+// gobal functions
+const countryPainter = (countryToFind) => {
+
+    $.ajax({
+        url: "libs/php/getCountrypolygon.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            country: countryToFind
+        },
+        success: function(result) {
+            // console.log(result)
+    
+            if (result.status.name == "ok") {
+                countries = result.data
+                index = 0;
+                if($(".leaflet-interactive")){
+                    $(".leaflet-interactive").remove();
+                }
+                for(let i=0; i < countries.features.length; i++){
+                    if(countries.features[i].properties.iso_a2 === countryToFind) {
+                        index = i;
+                    }
+                }
+                
+                L.geoJSON(countries.features[index], {
+                    style:  {
+                        "color": "#a2a2a3",
+                        "weight": 5,
+                        "opacity": 0.65
+                    }
+                }).addTo(map);
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // your error code
+        }
+    }); 
+
+}
+
