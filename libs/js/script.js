@@ -73,8 +73,8 @@ $(function(){
 
                 if (result.status.name == "ok") {
                     let countryCode = result.data[0].properties.components["ISO_3166-1_alpha-2"];
-                    // countryPainter(countryCode); // creates a polygon around the users country
-                    map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true) //fly to users location
+                    countryPainter(countryCode); // creates a polygon around the users country
+                    // map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true) //fly to users location
                     L.marker([userLatitude, userLongitude]).addTo(map);  // creates a marker on users location
                 }
             
