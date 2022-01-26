@@ -156,7 +156,7 @@ const countryPainter = (countryToFind) => {
             if (result.status.name == "ok") {
                 countries = result.data
                 index = 0;
-                L.geoJSON().clearLayers();
+                
                 for(let i=0; i < countries.features.length; i++){
                     if(countries.features[i].properties.iso_a2 === countryToFind) {
                         index = i;
