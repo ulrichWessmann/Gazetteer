@@ -8,7 +8,8 @@ attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Int
 .addTo(map);
 
 let markers;
-var border;
+let border;
+let test;
 
 
 $(function(){
@@ -55,7 +56,7 @@ $(function(){
 
         // Grab and reassign variable names
         ({ latitude: userLatitude, longitude: userLongitude } = results.coords)
-        console.log(userLatitude, userLongitude)
+        // console.log(userLatitude, userLongitude)
 
         // get country name from lat long
         $.ajax({
@@ -69,13 +70,19 @@ $(function(){
             success: function(result) {
 
                 // console.log(JSON.stringify(result));
-                console.log(result)
+                // console.log(result)
 
                 if (result.status.name == "ok") {
-                    let countryCode = result.data[0].properties.components["ISO_3166-1_alpha-2"];
-                    countryPainter(countryCode); // creates a polygon around the users country
+                    let countryCode = result.data[0].properties.components;
+                    countryPainter(countryCode["ISO_3166-1_alpha-2"]); // creates a polygon around the users country
                     // map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true) //fly to users location
-                    L.marker([userLatitude, userLongitude]).addTo(map);  // creates a marker on users location
+                    markers = L.marker([userLatitude, userLongitude]).addTo(map);
+                    test = L.popup()
+                        .setLatLng([userLatitude, userLongitude])
+                        .setContent(`<p>Hello there!<br />It appears that you are in ${countryCode["country"]}.</p>`)
+                        .openOn(map);
+
+                    markers.bindPopup(test).openPopup()
                 }
             
             },
@@ -113,15 +120,21 @@ $(function(){
 
 				if (result.status.name == "ok") {
                     // remove any markers
-                    
-                    countryData = result.data[0]
-                    console.log([countryData.latlng[0], countryData.latlng[1]])
-
-                    //change map view to country general location
-
+                    if(markers){
+                        map.removeLayer(markers);
+                    }
                     // mark capitals
-                    const countryCapital = [countryData.capitalInfo.latlng[0], countryData.capitalInfo.latlng[1]]
-                    console.log(countryCapital)
+                    const countryCapital = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
+                    markers = L.marker(countryCapital).addTo(map);
+                      // creates a marker on users location
+
+                    test = L.popup()
+                    .setLatLng(countryCapital)
+                    .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p>`)
+                    .openOn(map);
+
+                    markers.bindPopup(test).openPopup()
+                    
 
 				}
 			
@@ -171,7 +184,7 @@ const countryPainter = (countryToFind) => {
                     style:  {
                         "color": "red",
                         "weight": 5,
-                        "opacity": 0.80
+                        "opacity": 0.20
                     }
                 }).addTo(map);
 
