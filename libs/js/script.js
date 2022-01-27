@@ -1,15 +1,23 @@
 
 // create map
+let defaultView = [51.505, -0.09];
+let markers;
+let border;
+let test;
 
-var map = L.map('map').setView([51.505, -0.09], 2);
+
+var myIcon = L.icon({
+    iconUrl: 'libs/images/castle.png',
+    iconSize: [80, 80],
+    popupAnchor: [0, -22],
+});
+
+
+var map = L.map('map').setView(defaultView, 2);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
 attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
 })
 .addTo(map);
-
-let markers;
-let border;
-let test;
 
 
 $(function(){
@@ -70,19 +78,32 @@ $(function(){
             success: function(result) {
 
                 // console.log(JSON.stringify(result));
-                // console.log(result)
+                console.log(result)
 
                 if (result.status.name == "ok") {
                     let countryCode = result.data[0].properties.components;
-                    countryPainter(countryCode["ISO_3166-1_alpha-2"]); // creates a polygon around the users country
-                    // map.flyTo([JSON.stringify(userLatitude), JSON.stringify(userLongitude)], 8, true) //fly to users location
-                    markers = L.marker([userLatitude, userLongitude]).addTo(map);
-                    test = L.popup()
+                    let countryISO = countryCode["ISO_3166-1_alpha-2"]
+                    countryPainter(countryISO); // creates a polygon around the users country
+                    
+
+                    if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){ // check if "the" needs to be added for syntactic sugar
+                        markers = L.marker([userLatitude, userLongitude]).addTo(map);
+                        test = L.popup()
+                        .setLatLng([userLatitude, userLongitude])
+                        .setContent(`<p>Hello there!<br />It appears that you are in the ${countryCode["country"]}.</p>`)
+                        .openOn(map);
+
+                        markers.bindPopup(test).openPopup()
+                    } else {
+                        markers = L.marker([userLatitude, userLongitude]).addTo(map);
+                        test = L.popup()
                         .setLatLng([userLatitude, userLongitude])
                         .setContent(`<p>Hello there!<br />It appears that you are in ${countryCode["country"]}.</p>`)
                         .openOn(map);
 
-                    markers.bindPopup(test).openPopup()
+                        markers.bindPopup(test).openPopup()
+                    }
+                    
                 }
             
             },
@@ -125,15 +146,26 @@ $(function(){
                     }
                     // mark capitals
                     const countryCapital = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
-                    markers = L.marker(countryCapital).addTo(map);
+                    markers =  L.marker(countryCapital, {icon: myIcon}).addTo(map);
+
                       // creates a marker on users location
+                      let countryISO = result.data[0].cca2
+                    if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
+                        test = L.popup()
+                        .setLatLng(countryCapital)
+                        .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${countryCapital}</span></p>`)
+                        .openOn(map);
 
-                    test = L.popup()
-                    .setLatLng(countryCapital)
-                    .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p>`)
-                    .openOn(map);
+                        markers.bindPopup(test).openPopup()    
+                    } else {
+                        test = L.popup()
+                        .setLatLng(countryCapital)
+                        .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${countryCapital}</span></p>`)
+                        .openOn(map);
 
-                    markers.bindPopup(test).openPopup()
+                        markers.bindPopup(test).openPopup()   
+                    }
+                    
                     
 
 				}
