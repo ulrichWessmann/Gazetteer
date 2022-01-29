@@ -1,3 +1,26 @@
 #map { 
-    height: 500px;
+    height: 90vh;
+    width: 100% 
+}
+.leaflet-left .leaflet-control {
+    margin-top: 100px;
+}
+#banner {
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    position: absolute;
+    z-index: 999;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-around
+}
+#countrySelection{
+    display: flex;
+}
+.modal{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
 }
