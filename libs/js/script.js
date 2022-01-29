@@ -3,7 +3,9 @@
 let defaultView = [51.505, -0.09];
 let markers;
 let border;
-let test;
+let capitalPopup;
+let cityMarkers;
+let currency;
 
 
 var myIcon = L.icon({
@@ -64,7 +66,6 @@ $(function(){
 
         // Grab and reassign variable names
         ({ latitude: userLatitude, longitude: userLongitude } = results.coords)
-        // console.log(userLatitude, userLongitude)
 
         // get country name from lat long
         $.ajax({
@@ -76,9 +77,6 @@ $(function(){
                 lng: userLongitude
             },
             success: function(result) {
-
-                // console.log(JSON.stringify(result));
-                console.log(result)
 
                 if (result.status.name == "ok") {
                     let countryCode = result.data[0].properties.components;
@@ -116,11 +114,26 @@ $(function(){
     
 
     // drop down menu border creation
-    $("#countrySelection").on("change", ()=>{
-        
-        countryPainter($('#countrySelection').val()); //grabs the country iso and creates border
-        
+    $("#countrySelection").on("change", ()=>{ 
+        countryPainter($('#countrySelection').val()); //grabs the country iso and creates border   
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // retrieve country info and fly to country
     // create marker for capitals
@@ -128,7 +141,7 @@ $(function(){
     $("#countrySelection").on("change", ()=> {
         // get countries lat and from from country code
         $.ajax({
-			url: "libs/php/getRestCountries.php",
+			url: "libs/php/getDisplayInfo.php",
 			type: 'POST',
 			dataType: 'json',
 			data: {
@@ -136,46 +149,131 @@ $(function(){
 			},
 			success: function(result) {
 
-				console.log((result));
-                
+				// console.log(result);
+
+                let capitalName = result.data[0].capital[0];
+                let firstCallResults = result.data
 
 				if (result.status.name == "ok") {
+                    
                     // remove any markers
                     if(markers){
                         map.removeLayer(markers);
                     }
                     // mark capitals
-                    const countryCapital = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
-                    markers =  L.marker(countryCapital, {icon: myIcon}).addTo(map);
+                    const capitalLatLng = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
+                    markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
 
-                      // creates a marker on users location
-                      let countryISO = result.data[0].cca2
+                    // creates a marker on users location
+                    let countryISO = result.data[0].cca2
                     if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
-                        test = L.popup()
-                        .setLatLng(countryCapital)
-                        .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${countryCapital}</span></p>`)
+                        capitalPopup = L.popup()
+                        .setLatLng(capitalLatLng)
+                        .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
                         .openOn(map);
 
-                        markers.bindPopup(test).openPopup()    
+                        markers.bindPopup(capitalPopup).openPopup()    
                     } else {
-                        test = L.popup()
-                        .setLatLng(countryCapital)
-                        .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${countryCapital}</span></p>`)
+                        capitalPopup = L.popup()
+                        .setLatLng(capitalLatLng)
+                        .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
                         .openOn(map);
 
-                        markers.bindPopup(test).openPopup()   
+                        markers.bindPopup(capitalPopup).openPopup()   
                     }
-                    
-                    
 
+                    // get countries currency
+
+                    Object.keys(firstCallResults[0].currencies).forEach(element=> {
+                        currency = element
+                    })
+
+                    console.log(currency)
+                   
+
+
+                    $.ajax({
+                        url: "libs/php/getModalInfo.php",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            capital: capitalName
+                        },
+                        success: function(result) {
+                            
+                            console.log(result)
+                            console.log("----------")
+                            console.log(result.currency.rates[currency])
+                            console.log("----------")
+                    
+                            if (result.status.name == "ok") {
+                                let wiki = result.wiki.geonames;
+                                let weather = result.weather;
+
+                                //   display weather data in modal //
+
+                                // country info
+
+                                $("#country").html(`${firstCallResults[0].name.common}`)
+                                $("#continent").html(`${firstCallResults[0].continents[0]}`)
+                                $("#population").html(`${firstCallResults[0].population}`)
+                                $("#languages").html(`${getLanguages(firstCallResults[0].languages)}`)
+                                $("#currency").html(`${getCurrency(firstCallResults[0].currencies)}`)
+                                $("#exchange").html(`${result.currency.rates[currency]}`)
+                               
+
+                                // // weather
+                                // $("#capital").html(`${}`)
+                                // $("#condition").html(`${}`)
+                                // $("#date").html(`${}`)
+                                // $("#temp").html(`${}`)
+                                // $("#feelsLike").html(`${}`)
+                                // $("#tempMin").html(`${}`)
+                                // $("#tempMax").html(`${}`)
+                                // $("#pressure").html(`${}`)
+                                // $("#humidity").html(`${}`)
+
+
+                                // wiki
+                                
+                                
+                            }
+                        
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // your error code
+                        }
+                    });
+
+
+
+                    // not working
+                    // result.data[1].forEach(element => {
+                    //     cityMarkers = L.marker([element.lat, element.lng]).addTo(map);
+                    //     cityMarkers.bindPopup(`<p>${element.name}</p>`);
+                    //     console.log(element.name)
+                    // })
 				}
-			
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				// your error code
 			}
 		}); 
     });
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -196,11 +294,11 @@ const countryPainter = (countryToFind) => {
             country: countryToFind
         },
         success: function(result) {
-            // console.log(result)
     
             if (result.status.name == "ok") {
                 countries = result.data
                 index = 0;
+               
                 
                 for(let i=0; i < countries.features.length; i++){
                     if(countries.features[i].properties.iso_a2 === countryToFind) {
@@ -230,4 +328,37 @@ const countryPainter = (countryToFind) => {
     }); 
 
 }
+
+
+const getLanguages = (target) => {
+
+    let newLanguages = "";
+    let max = Object.keys(target).length;
+
+    Object.keys(target).forEach((element, index) => {
+
+        if(index === 0 ){
+            newLanguages += `${target[element]}`
+        } else if (index === max - 1 || max === 1){
+            newLanguages += ` and ${target[element]}.`
+        } else {
+            newLanguages += `, ${target[element]}`
+        }
+    });
+
+    return newLanguages;
+
+};
+
+const getCurrency = (target) =>{
+    let currency;
+    Object.keys(target).forEach(element => {
+        currency = target[element].name
+    })
+    return currency;
+};
+
+
+
+
 
