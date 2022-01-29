@@ -201,41 +201,40 @@ $(function(){
                         },
                         success: function(result) {
                             
-                            console.log(result)
-                            console.log("----------")
-                            console.log(result.currency.rates[currency])
-                            console.log("----------")
-                    
                             if (result.status.name == "ok") {
-                                let wiki = result.wiki.geonames;
+                                let wiki = result.wiki;
                                 let weather = result.weather;
 
                                 //   display weather data in modal //
 
                                 // country info
-
                                 $("#country").html(`${firstCallResults[0].name.common}`)
                                 $("#continent").html(`${firstCallResults[0].continents[0]}`)
                                 $("#population").html(`${firstCallResults[0].population}`)
                                 $("#languages").html(`${getLanguages(firstCallResults[0].languages)}`)
                                 $("#currency").html(`${getCurrency(firstCallResults[0].currencies)}`)
-                                $("#exchange").html(`${result.currency.rates[currency]}`)
+                                $("#exchange").html(`1 USD = ${result.currency.rates[currency]} ${currency}`)
                                
 
                                 // // weather
-                                // $("#capital").html(`${}`)
-                                // $("#condition").html(`${}`)
-                                // $("#date").html(`${}`)
-                                // $("#temp").html(`${}`)
-                                // $("#feelsLike").html(`${}`)
-                                // $("#tempMin").html(`${}`)
-                                // $("#tempMax").html(`${}`)
-                                // $("#pressure").html(`${}`)
-                                // $("#humidity").html(`${}`)
-
+                                $("#capital").html(`${weather.name}`)
+                                $("#condition").html(`${weather.weather[0].description}`)
+                                $("#date").html(`${getDate()}`)
+                                $("#temp").html(`${weather.main.temp}&#8451`)
+                                $("#feelsLike").html(`${weather.main.feels_like}&#8451`)
+                                $("#tempMin").html(`${weather.main.temp_min}&#8451;`)
+                                $("#tempMax").html(`${weather.main.temp_max}&#8451;`)
+                                $("#pressure").html(`${weather.main.pressure}`)
+                                $("#humidity").html(`${weather.main.humidity}&#37;`)
 
                                 // wiki
-                                
+                                $("#wikiTitle").html(`${weather.name} Wiki`)
+                                $("#wikiOneTitle").html(`${wiki[0].title}`)
+                                $("#wikiOneLink").html(`<a href="https://${wiki[0].wikipediaUrl}">${wiki[0].wikipediaUrl}</a>`)
+                                $("#wikiTwoTitle").html(`${wiki[1].title}`)
+                                $("#wikiTwoLink").html(`<a href="https://${wiki[1].wikipediaUrl}">${wiki[1].wikipediaUrl}</a>`)
+                                $("#wikiThreeTitle").html(`${wiki[2].title}`)
+                                $("#wikiThreeLink").html(`<a href="https://${wiki[2].wikipediaUrl}">${wiki[2].wikipediaUrl}</a>`)
                                 
                             }
                         
@@ -248,6 +247,7 @@ $(function(){
 
 
                     // not working
+
                     // result.data[1].forEach(element => {
                     //     cityMarkers = L.marker([element.lat, element.lng]).addTo(map);
                     //     cityMarkers.bindPopup(`<p>${element.name}</p>`);
@@ -357,6 +357,15 @@ const getCurrency = (target) =>{
     })
     return currency;
 };
+
+const getDate = () => {
+    
+    let newDate = new Date;
+    let options = { weekday: 'long', day: 'numeric', month: 'long' }
+    let todaysDate = newDate.toLocaleDateString("en-GB", options).replace(/,/, '')
+    return todaysDate;
+
+}
 
 
 

@@ -8,34 +8,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin=""/>
-    <style>
-        #map { 
-            height: 90vh;
-            width: 100% 
-        }
-        .leaflet-left .leaflet-control {
-            margin-top: 100px;
-        }
-        #banner {
-            width: 100%;
-            background-color: white;
-            border: 1px solid #ddd;
-            position: absolute;
-            z-index: 999;
-            height: 10vh;
-            display: flex;
-            align-items: center;
-            justify-content: space-around
-        }
-        #countrySelection{
-            display: flex;
-        }
-        .modal{
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-        }
-    </style>
+    <link rel="stylesheet" href="libs/css/styles.css" />
+
 </head>
     <body>
         <div id="banner">
@@ -66,7 +40,14 @@
             <p id="humidity"></p>
            </div>
 
-           <div id="wiki">
+           <div>
+               <p id="wikiTitle"></p>
+               <p id="wikiOneTitle"></p>
+               <p id="wikiOneLink"></p>
+               <p id="wikiTwoTitle"></p>
+               <p id="wikiTwoLink"></p>
+               <p id="wikiThreeTitle"></p>
+               <p id="wikiThreeLink"></p>
            </div>
         </div>
         
