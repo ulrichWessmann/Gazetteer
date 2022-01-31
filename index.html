@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin=""/>
@@ -15,17 +15,13 @@
 
       <div id="map">
         <div class="container-fluid g-0 fixed-top hstack p-2 ">
-          <select id="countrySelection">
-          </select>
+          <select id="countrySelection" aria-placeholder="Select Country"></select>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
             Gazetteer
           </button>
         </div>
       </div>
      
-    
-
-        <!-- Button trigger modal -->
 
 
 <!-- Modal -->
