@@ -1,62 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gazetteer</title>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin=""/>
-    <link rel="stylesheet" href="libs/css/styles.css" />
-
-</head>
+    <link rel="stylesheet" href="custom.9a100251.css">
+  </head>
+  <body>
     <body>
-        <div id="banner">
-            <select id="countrySelection"></select>
-            <!-- <button id="btn">Press me</button> -->
-        </div>
-        <div id="map"></div>
-            
-        <div class="modal">
-           <div class="countryInfo">
-               <p id="country"></p>
-               <p id="continent"></p>
-               <p id="population"></p>
-               <p id="languages"></p>
-               <p id="currency"></p>
-               <p id="exchange"></p>
-           </div>
-
-           <div class="weather">
-            <p id="capital"></p>
-            <p id="condition"></p>
-            <p id="date"></p>
-            <p id="temp"></p>
-            <p id="feelsLike"></p>
-            <p id="tempMin"></p>
-            <p id="tempMax"></p>
-            <p id="pressure"></p>
-            <p id="humidity"></p>
-           </div>
-
-           <div>
-               <p id="wikiTitle"></p>
-               <p id="wikiOneTitle"></p>
-               <p id="wikiOneLink"></p>
-               <p id="wikiTwoTitle"></p>
-               <p id="wikiTwoLink"></p>
-               <p id="wikiThreeTitle"></p>
-               <p id="wikiThreeLink"></p>
-           </div>
-        </div>
         
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-    crossorigin=""></script>
+      
+
+      <div id="map">
+        <div class="container-fluid g-0 fixed-top hstack p-2 ">
+          <select id="countrySelection">
+          </select>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+            Gazetteer
+          </button>
+        </div>
+      </div>
+     
     
+
+        <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white fw-bold " id="exampleModalLabel"><span id="country">Please select a country</span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-backdrop="false"></button>
+      </div>
+      <div class="modal-body text-white">
+        <div class="container-fluid">
+          <!-- row 1 -->
+
+        <table class="table text-white table-borderless hs">
+          <tbody>
+            <tr>
+              <td class="fw-bold">Continent:</td>
+              <td class="tableFont" id="continent"></td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Population:</td>
+              <td class="tableFont" id="population"></td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Languages:</td>
+              <td class="tableFont" id="languages"></td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Currency:</td>
+              <td class="tableFont" id="currency"></td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Exchange:</td>
+              <td class="tableFont" id="exchange"></td>
+            </tr>
+            </tr>
+          </tbody>
+        </table>
+
+            <div class="row ">
+              <div class="col">
+              </div>
+              <div class="col hstack fw-bold">
+                <p class="text-center">Weather in <span id="capital"></span></p>
+              </div>
+              <div class="col">
+              </div>
+            </div>
+            <div class="row ">
+              <div class="col">
+              </div>
+              <div class="col hstack">
+                <p id="condition"></p>
+              </div>
+              <div class="col">
+              </div>
+            </div>
+            
+            <!-- table -->
+            <table class="table text-white table-borderless hs">
+              <tbody>
+                <tr>
+                  <td class="fw-bold">Date:</td>
+                  <td class="tableFont" id="date"></td>
+                </tr>
+                <tr>
+                  <td class="fw-bold">Temperature:</td>
+                  <td class="tableFont" id="temp"></td>
+                </tr>
+                <tr>
+                  <td class="fw-bold">Feels Like:</td>
+                  <td class="tableFont" id="feelsLike"></td>
+                </tr>
+                <tr>
+                  <td class="fw-bold">High:</td>
+                  <td class="tableFont" id="tempMax"></td>
+                </tr>
+                <tr>
+                  <td class="fw-bold">Low:</td>
+                  <td class="tableFont" id="tempMin"></td>
+                </tr>
+                <tr>
+                  <td class="fw-bold">Pressure:</td>
+                  <td class="tableFont" id="pressure"></td>
+                </tr>
+                <tr>
+                  <td class="fw-bold">Humidity:</td>
+                  <td class="tableFont" id="humidity"></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- wiki section -->
+            <div class="bg-white text-black rounded">
+              <div class="row fw-bold text-center">
+                <p id="wikiOneTitle"></p>
+              </div>
+              <p id="wikiOneLink"></p>
+            </div>
+
+            <div class="bg-white text-black rounded">
+              <div class="row fw-bold text-center">
+                <p id="wikiTwoTitle"></p>
+              </div>
+              <p id="wikiTwoLink"></p>
+            </div>
+
+            <div class="bg-white text-black rounded">
+              <div class="row fw-bold text-center">
+                <p id="wikiThreeTitle"></p>
+              </div>
+              <p id="wikiThreeLink"></p>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+  
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="libs/js/script.js" type="text/javascript"></script>
-    
-</body>
+    <script src="src.dddffba9.js"></script>
+    <script src="./js/script.js"></script>
+  </body>
 </html>
