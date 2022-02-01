@@ -1,0 +1,159 @@
+#map { 
+    height: 90vh;
+    width: 100% 
+}
+.leaflet-left .leaflet-control {
+    margin-top: 100px;
+}
+#countrySelection{
+    display: flex;
+}
+.modal{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+}
+
+/* added from bootstrap project */
+
+html, body {
+    margin: 0; 
+    height: 100%;
+    padding: 0;
+}
+#map {
+    height: 100%;
+    width: 100vw;
+    position:absolute;
+    top: 0;
+    bottom:0;
+    right:0;
+    left:0;
+}
+#countrySelection{
+    display: flex;
+}
+
+.container {
+    position: fixed;
+    z-index: 999;
+    background-color: black;
+}
+
+.leaflet-top {
+    padding-top: 7vh;
+    top:25px;
+}
+.modal-content {
+    background-color: rgba(236, 240, 243, 0.877) !important;
+    border: 11px solid rgba(0,0,0, 20%) !important;
+    border-radius: 1.2em !important;
+}
+ .modal-dialog-scrollable .modal-content {
+    max-height: 85%;
+ }
+
+ .hstack {
+    justify-content: space-around;
+ }
+
+ 
+ .container-fluid.g-0.fixed-top.hstack.p-2  {
+    background-color: #64788085;
+ }
+
+/* //  weather section */
+
+#capital {
+    margin-bottom: 0;
+    text-align: center;
+    width: auto;
+}
+
+#condition {
+    margin-top: -5px;
+    font-size: 14px;
+    text-align: center;
+}
+
+p#wikiOneTitle, p#wikiTwoTitle, p#wikiThreeTitle {
+    margin-bottom: 0;
+    padding: 10px 0 0 0;
+}
+
+p#wikiOneLink, #wikiTwoLink, #wikiThreeLink {
+    text-align: center;
+    padding: 0 0 10px 0;
+    overflow-wrap: break-word;
+}
+
+.row.text-center.hstack{
+    padding-top: 10px;
+}
+
+.bg-white.text-black.rounded {
+    margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* icons */
+.fas.fa-map-marker{
+    font-size: 2em !important;
+    color: rgba(211, 146, 146, 0.712) !important;
+}
+
+.fas.fa-info {
+   font-size: 1.5em;
+   color: lightseagreen
+  }
+
+i.fas.fa-sun {
+    bottom: 20px;
+    font-size: 1.5em;
+    color: orange;
+}
+.leaflet-bar i, .leaflet-bar span { 
+    line-height:30px;
+}
+
+.leaflet-left .leaflet-control {
+    margin-top: 6px;
+}
+
+/* // hide leaflet zoom control // */
+.leaflet-control-zoom.leaflet-bar.leaflet-control {
+    margin-top: 0px;
+    top: -40px;
+}
+
+/* @media only screen and (max-width: 600px) {
+    .leaflet-control-zoom.leaflet-bar.leaflet-control {
+
+    }
+    
+  } */
+
+td {
+    padding: 10px 0 10px 0 !important;
+}
+
+.tableFont {
+    text-align: end;
+}
+
+/* easy button styling */
+
+.btn-close.weather {
+    padding: 0.5rem 0.5rem;
+    margin: 0rem 0.5rem -0.5rem auto;
+}
+
+/* div.modal-content.weather {
+    background-image:url(https://www.rochesterfirst.com/wp-content/uploads/sites/66/2021/04/sky-1107579_1920.jpg) 
+} */
+
+.modal-backdrop {
+    background-color: rgba(0,0,0,.0001) !important;
+}
+
