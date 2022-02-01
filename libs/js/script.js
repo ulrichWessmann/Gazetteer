@@ -1,3 +1,10 @@
+// preloader
+$(window).on("load", () => {
+    $('.preloader-wrapper').delay(1000).fadeOut('slow', () => {
+        $('.preloader-wrapper').remove();
+    });
+ });
+
 let capitalPopup;
 let cityMarkers;
 let currency;
