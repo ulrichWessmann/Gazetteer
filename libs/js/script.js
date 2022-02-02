@@ -1,4 +1,3 @@
-// preloader
 $(window).on("load", () => {
     $('.preloader-wrapper').delay(1000).fadeOut('slow', () => {
         $('.preloader-wrapper').remove();
@@ -12,33 +11,47 @@ let exchange;
 let countryBounds;
 let countryISO;
 
-var myIcon = L.icon({
-    iconUrl: 'libs/images/castle.png',
-    iconSize: [80, 80],
-    popupAnchor: [0, -22],
+
+// var myIcon = L.icon({
+//     iconUrl: 'libs/images/castle.png',
+//     iconSize: [80, 80],
+//     popupAnchor: [0, -22],
+// });
+const myIcon = L.divIcon({
+    html: '<i class="fas fa-landmark"></i>',
+    iconSize: [20, 20],
+    className: 'myDivIcon'
 });
 
 let defaultView = [51.505, -0.09];
 let markers;
+var markerCluster = L.markerClusterGroup();
 let border;
 let borderStyle = {
-    "color": "black",
-    "weight": 3,
-    "opacity": 0.20
+    "color": "red",
+    "weight": 7,
+    "opacity": 0.15,
+    "fillColor": "black",
+    "fillOpacity": 0.3
 }
 
-var map = L.map('map').setView(defaultView, 4);
+let map = L.map('map').setView(defaultView, 4);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
 attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
 })
 .addTo(map);
 
-var shelterMarkers = L.featureGroup();
-    map.addLayer(shelterMarkers);
+// let wikiMarkers = L.featureGroup();
+//     map.addLayer(wikiMarkers);
 
-const fontAwesomeIcon = L.divIcon({
-    html: '<i class="fas fa-map-marker"></i>',
-    className: 'myDivIcon'
+// const fontAwesomeIcon = L.divIcon({
+//     html: '<i class="fas fa-map-marker"></i>',
+//     className: 'myDivIcon'
+// });
+var fontAwesomeIcon = L.icon({
+    iconUrl: 'libs/images/299087_marker_map_icon.png',
+    iconSize: [40, 40],
+    popupAnchor: [0, -22],
 });
 
 // easy button
@@ -47,226 +60,148 @@ L.easyButton( '<i class="fas fa-info"></i>', function(){
     $("#myModal").modal("show")
   }).addTo(map);
 
-L.easyButton( '<i class="fas fa-sun"></i>', function(){
+L.easyButton( '<i class="fas fa-cloud-sun"></i>', function(){
 $("#myModalWeather").modal("show")
 }).addTo(map);
 
 
 $(function(){
-
-    // Onload drop down creation // first item to load
     $.ajax({
         url: "libs/php/getCountryNames.php",
         type: 'POST',
         dataType: 'json',
         success: function(result) {  
-
+    
             if (result.status.name == "ok") {
-            let countriesObject = [];
-            for(let i = 0; i < result.data.features.length; i++){
-            countriesObject.push({
-                "name": `${result.data.features[i].properties.name}`, 
-                "iso_a2": `${result.data.features[i].properties.iso_a2}`
-                });
-            };
-            countriesObject.sort( function( a, b ) {
-                a = a.name.toLowerCase();
-                b = b.name.toLowerCase();
-
-                return a < b ? -1 : a > b ? 1 : 0;
-            });
-            for(let i= countriesObject.length -1; i >= 0; i--){
-                $("#countrySelection").prepend(`<option value="${countriesObject[i].iso_a2}">${countriesObject[i].name}</option>`);
-                }
+                const data = result.data
+                // for(let i = data.length -1; i >= 0; i--){
+                //     $("#countrySelection").prepend(`<option value="${data[i].iso_a2}">${data[i].name}</option>`);
+                // }
+                data.forEach(function (country) {
+                    $("<option>", {
+                        value: country.iso_a2,
+                        text: country.name
+                    }).appendTo("#countrySelection");
+                });  
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus);
-            console.log(errorThrown)
+            console.log(errorThrown);
         }
     });
-
-    // get users lat and long from browser
-    navigator.geolocation.getCurrentPosition((results)=>{
-        // Grab and reassign variable names
-        ({ latitude: userLatitude, longitude: userLongitude } = results.coords)
-        // get country name from lat long
-        $.ajax({
-            url: "libs/php/getOpenCageByLatLng.php",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                lat: userLatitude,
-                lng: userLongitude
-            },
-            success: function(result) {
-
-                if (result.status.name == "ok") {
-                    let countryCode = result.data[0].properties.components;
-                    let currentISO = countryCode["ISO_3166-1_alpha-2"]
-                    countryPainter(currentISO); // creates a polygon around the users country
-                    $("#countrySelection").val(currentISO).change();
-                }
-            
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                // your error code
-            }
-        }); 
-    })
-
+    // Onload drop down creation // first item to load
     
 
-    // drop down menu border creation
-    $("#countrySelection").on("change", ()=>{ 
-        countryPainter($('#countrySelection').val()); 
-    });
+    // get users lat and long from browser
+    navigator.geolocation.getCurrentPosition(userPosition)
 
+    
+})
+
+const userPosition = (success) => {
+    let userLatitude = success.coords.latitude
+    let userLongitude = success.coords.longitude
+
+    $.ajax({
+        url: "libs/php/getOpenCageByLatLng.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            lat: userLatitude,
+            lng: userLongitude
+        },
+        success: function(result) {
+
+            if (result.status.name == "ok") {
+                let countryCode = result.data[0].properties.components;
+                let countryISO = countryCode["ISO_3166-1_alpha-2"]
+                // countryPainter(currentISO); // creates a polygon around the users country
+                $("#countrySelection").val(countryISO).change();
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    }); 
+}
+
+    
 
 
     // retrieve country info and fly to country
     // create marker for capitals
-    $("#countrySelection").on("change", ()=> {
-        let wiki;
-        // get countries lat and from from country code
-        $.ajax({
-			url: "libs/php/getRestCountry.php",
-			type: 'POST',
-			dataType: 'json',
-			data: {
-				country: $('#countrySelection').val(),
-			},
-			success: function(result) {
+$("#countrySelection").on("change", ()=> {
+    let currentISO = $('#countrySelection').val()
+    // drop down menu border creation
+    countryPainter(currentISO);
+    // wikiMarkers.clearLayers();
+    // get countries lat and from from country code
+    $.ajax({
+        url: "libs/php/getRestCountry.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            country: currentISO,
+        },
+        success: function(result) {
+            let capitalName = result.data[0].capital[0];
+            let restCountryData = result.data
+
+            if (result.status.name == "ok") {
                 
-                let capitalName = result.data[0].capital[0];
-                let restCountryData = result.data
-                let weather;
+                // remove any markers
+                if(markers){
+                    map.removeLayer(markers);
+                }
+                // mark capitals
+                const capitalLatLng = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
+                markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
 
-				if (result.status.name == "ok") {
-                    
-                    // remove any markers
-                    if(markers){
-                        map.removeLayer(markers);
-                    }
-                    // mark capitals
-                    const capitalLatLng = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
-                    markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
+                countryISO = result.data[0].cca2
+                if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
+                    capitalPopup = L.popup()
+                    .setLatLng(capitalLatLng)
+                    .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
+                    .openOn(map);
 
-                    // creates a marker on users location
-                    countryISO = result.data[0].cca2
-                    
-                    if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
-                        capitalPopup = L.popup()
-                        .setLatLng(capitalLatLng)
-                        .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
-                        .openOn(map);
+                    markers.bindPopup(capitalPopup).openPopup()    
+                } else {
+                    capitalPopup = L.popup()
+                    .setLatLng(capitalLatLng)
+                    .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
+                    .openOn(map);
 
-                        markers.bindPopup(capitalPopup).openPopup()    
-                    } else {
-                        capitalPopup = L.popup()
-                        .setLatLng(capitalLatLng)
-                        .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
-                        .openOn(map);
+                    markers.bindPopup(capitalPopup).openPopup()   
+                }
 
-                        markers.bindPopup(capitalPopup).openPopup()   
-                    }
+                // get countries currency
+                Object.keys(restCountryData[0].currencies).forEach(element=> {
+                    currency = element
+                })
+                
+                $("#country").html(`${restCountryData[0].name.common}`)
+                $("#continent").html(`${restCountryData[0].continents[0]}`)
+                $("#population").html((`${restCountryData[0].population}`).replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,"))
+                $("#languages").html(`${getLanguages(restCountryData[0].languages)}`)
+                $("#currency").html(`${getCurrency(restCountryData[0].currencies)}`)
 
-                    // get countries currency
-                    Object.keys(restCountryData[0].currencies).forEach(element=> {
-                        currency = element
-                    })
-                   
-                    $("#country").html(`${restCountryData[0].name.common}`)
-                    $("#continent").html(`${restCountryData[0].continents[0]}`)
-                    $("#population").html(`${restCountryData[0].population}`)
-                    $("#languages").html(`${getLanguages(restCountryData[0].languages)}`)
-                    $("#currency").html(`${getCurrency(restCountryData[0].currencies)}`)
-                    
-                    // get weather
-                    $.ajax({
-                        url: "libs/php/getWeather.php",
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            capital: capitalName
-                        },
-                        success: function(result) {
-                            
-                            if (result.status.name == "ok") {
-                                weather = result.weather;
+                getWeather(capitalName)
+                getExchange(capitalName)
+                getWiki(countryBounds)
+                
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    }); 
+    
+});
 
-                                $("#capital").html(`${weather.name}`)
-                                $("#condition").html(`${weather.weather[0].description}`)
-                                $("#date").html(`${getDate()}`)
-                                $("#temp").html(`${weather.main.temp}&#8451`)
-                                $("#feelsLike").html(`${weather.main.feels_like}&#8451`)
-                                $("#tempMin").html(`${weather.main.temp_min}&#8451;`)
-                                $("#tempMax").html(`${weather.main.temp_max}&#8451;`)
-                                $("#pressure").html(`${weather.main.pressure}`)
-                                $("#humidity").html(`${weather.main.humidity}&#37;`)
-                               
-                            }
-                        
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            // your error code
-                        }
-                    });
-
-                    //get Wiki
-                    $.ajax({
-                        url: "libs/php/getWiki.php",
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            north: countryBounds.north,
-                            south: countryBounds.south,
-                            east: countryBounds.east,
-                            west: countryBounds.west
-                        },
-                        success: function(result) {
-                            if (result.status.name == "ok") {
-                                wiki = result.wiki;
-                                createMarkers(wiki);
-                            }
-                        
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            // your error code
-                        }
-                    });
-
-                    $.ajax({
-                        url: "libs/php/getExchangeRate.php",
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            capital: capitalName
-                        },
-                        success: function(result) {
-                            
-                            if (result.status.name == "ok") {
-                                $("#exchange").html(`1 USD = ${result.currency.rates[currency]} ${currency}`)
-                            }
-                        
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            // your error code
-                        }
-                    });
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				// your error code
-			}
-		}); 
-        
-    });
-
-})
-
-// functions:
-// create country borders
 const countryPainter = (countryToFind) => {
 
     $.ajax({
@@ -279,21 +214,11 @@ const countryPainter = (countryToFind) => {
         success: function(result) {
     
             if (result.status.name == "ok") {
-                countries = result.data
-                index = 0;
-               
-                
-                for(let i=0; i < countries.features.length; i++){
-                    if(countries.features[i].properties.iso_a2 === countryToFind) {
-                        index = i;
-                    }
-                }
-
                 if(border){
                     map.removeLayer(border)
                 }
                 
-                border = L.geoJSON(countries.features[index], borderStyle).addTo(map);
+                border = L.geoJSON(result, borderStyle).addTo(map);
 
                 map.flyToBounds(border)
 
@@ -306,12 +231,12 @@ const countryPainter = (countryToFind) => {
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            // your error code
+            console.log(textStatus);
+            console.log(errorThrown);
         }
     }); 
 
 }
-
 
 const getLanguages = (target) => {
 
@@ -351,25 +276,99 @@ const getDate = () => {
 }
 
 const createMarkers = (wiki) => {
-    if(shelterMarkers){
-            shelterMarkers.clearLayers();
-        }
+
     for (let i = 0; i < wiki.length; i++) {
         if(countryISO === wiki[i].countryCode){
-            
-            marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}).addTo(shelterMarkers);
+            markerCluster.addLayer(L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}))
             context = L.popup()
             .setLatLng([wiki[i].lat, wiki[i].lng])
             .setContent(`<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`)
-            marker.bindPopup(context)
-            
-
+            markerCluster.bindPopup(context)
+            map.addLayer(markerCluster)
         } else {
             continue; 
         }
     }
 }
 
+const getWeather = (capital) => {
+    $.ajax({
+    url: "libs/php/getWeather.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+        capital: capital
+    },
+    success: function(result) {
+        
+        if (result.status.name == "ok") {
+            weather = result.weather;
+
+            $("#capital").html(`${weather.name}`)
+            $("#condition").html(`${weather.weather[0].description}`)
+            $("#date").html(`${getDate()}`)
+            $("#temp").html(`${weather.main.temp}&#8451`)
+            $("#feelsLike").html(`${weather.main.feels_like}&#8451`)
+            $("#tempMin").html(`${weather.main.temp_min}&#8451;`)
+            $("#tempMax").html(`${weather.main.temp_max}&#8451;`)
+            $("#pressure").html(`${weather.main.pressure}`)
+            $("#humidity").html(`${weather.main.humidity}&#37;`)
+            
+        }
+    
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
+        console.log(errorThrown);
+    }
+    });
+}
+
+const getExchange = (capitalName) => {
+    $.ajax({
+        url: "libs/php/getExchangeRate.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            capital: capitalName
+        },
+        success: function(result) {
+            
+            if (result.status.name == "ok") {
+                $("#exchange").html(`1 USD = ${result.currency.rates[currency]} ${currency}`)
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // your error code
+        }
+    });
+}
+
+const getWiki = (countryBounds) => {
+    $.ajax({
+        url: "libs/php/getWiki.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            north: countryBounds.north,
+            south: countryBounds.south,
+            east: countryBounds.east,
+            west: countryBounds.west
+        },
+        success: function(result) {
+            if (result.status.name == "ok") {
+                let wiki = result.wiki;
+                createMarkers(wiki);
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+}
 
 
 

@@ -23,24 +23,7 @@
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-	$output['data'] = $decode; //data[0]
-
-	// get cities from geonames
-
-	// $secondUrl = "api.geonames.org/searchJSON?country=".$code."&fcode=PPLA2&username=sa3kes&cities=cities15000";
-
-	// $chTwo = curl_init();
-	// curl_setopt($chTwo, CURLOPT_SSL_VERIFYPEER, false);
-	// curl_setopt($chTwo, CURLOPT_RETURNTRANSFER, true);
-	// curl_setopt($chTwo, CURLOPT_URL,$secondUrl);
-
-	// $resultTwo = curl_exec($chTwo);
-
-	// curl_close($chTwo);
-
-	// $decodeTwo = json_decode($resultTwo,true);	
-
-	// $output["data"][1] = $decodeTwo["geonames"];
+	$output['data'] = $decode;
 
 	header('Content-Type: application/json; charset=UTF-8');
 

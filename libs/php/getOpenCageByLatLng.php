@@ -1,7 +1,5 @@
 <?php
 
-	// remove for production
-
 	$key = "6f1183266d26427bb604af7c2266bc31";
 
 	$executionStartTime = microtime(true);
