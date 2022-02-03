@@ -112,6 +112,12 @@ const userPosition = (success) => {
     }); 
 }
 
+// MAP DOUBLE CLICK EVENT
+
+map.on('dblclick', function(e) {
+    userPosition(e)
+});
+
 // ON CHANGE EVENT //
 $("#countrySelection").on("change", ()=> {
     let currentISO = $('#countrySelection').val()
@@ -141,7 +147,10 @@ $("#countrySelection").on("change", ()=> {
                 let capitalLat =`${result.data[0].capitalInfo.latlng[0]}&#176;`;
                 let capitalLng = `${result.data[0].capitalInfo.latlng[1]}&#176;`;
                 let inlineStyle = 'style="display: block; text-align: center"'
-                markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
+                markers =  L.marker(capitalLatLng, {
+                    icon: myIcon,
+
+                }).addTo(map);
 
                 countryISO = result.data[0].cca2
                 if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
@@ -363,7 +372,3 @@ const createMarkers = (wiki) => {
 };
 
 
-map.on('click', function(e) {
-    console.log(e.latlng);// ev is an event object (MouseEvent in this case)
-    userPosition(e)
-});
