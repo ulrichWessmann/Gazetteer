@@ -1,29 +1,15 @@
-$(window).on("load", () => {
-    $('.preloader-wrapper').delay(1000).fadeOut('slow', () => {
-        $('.preloader-wrapper').remove();
-    });
- });
-
 let capitalPopup;
-let cityMarkers;
 let currency;
-let exchange;
 let countryBounds;
 let countryISO;
 
-
-// var myIcon = L.icon({
-//     iconUrl: 'libs/images/castle.png',
-//     iconSize: [80, 80],
-//     popupAnchor: [0, -22],
-// });
-const myIcon = L.divIcon({
-    html: '<i class="fas fa-landmark"></i>',
-    iconSize: [20, 20],
-    className: 'myDivIcon'
-});
-
 let defaultView = [51.505, -0.09];
+let map = L.map('map').setView(defaultView, 4);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+})
+.addTo(map);
+
 let markers;
 var markerCluster = L.markerClusterGroup();
 let border;
@@ -34,27 +20,16 @@ let borderStyle = {
     "fillColor": "black",
     "fillOpacity": 0.3
 }
-
-let map = L.map('map').setView(defaultView, 4);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-})
-.addTo(map);
-
-// let wikiMarkers = L.featureGroup();
-//     map.addLayer(wikiMarkers);
-
-// const fontAwesomeIcon = L.divIcon({
-//     html: '<i class="fas fa-map-marker"></i>',
-//     className: 'myDivIcon'
-// });
 var fontAwesomeIcon = L.icon({
     iconUrl: 'libs/images/299087_marker_map_icon.png',
     iconSize: [40, 40],
     popupAnchor: [0, -22],
 });
-
-// easy button
+const myIcon = L.divIcon({
+    html: '<i class="fas fa-landmark"></i>',
+    iconSize: [20, 20],
+    className: 'myDivIcon'
+});
 
 L.easyButton( '<i class="fas fa-info"></i>', function(){
     $("#myModal").modal("show")
@@ -64,7 +39,14 @@ L.easyButton( '<i class="fas fa-cloud-sun"></i>', function(){
 $("#myModalWeather").modal("show")
 }).addTo(map);
 
+// PRELOADER //
+$(window).on("load", () => {
+    $('.preloader-wrapper').delay(1000).fadeOut('slow', () => {
+        $('.preloader-wrapper').remove();
+    });
+ });
 
+// DOCUMENT READY - INITIAL POSITION //
 $(function(){
     $.ajax({
         url: "libs/php/getCountryNames.php",
@@ -77,7 +59,7 @@ $(function(){
                 // for(let i = data.length -1; i >= 0; i--){
                 //     $("#countrySelection").prepend(`<option value="${data[i].iso_a2}">${data[i].name}</option>`);
                 // }
-                data.forEach(function (country) {
+                data.forEach((country) => {
                     $("<option>", {
                         value: country.iso_a2,
                         text: country.name
@@ -90,13 +72,8 @@ $(function(){
             console.log(errorThrown);
         }
     });
-    // Onload drop down creation // first item to load
-    
-
     // get users lat and long from browser
     navigator.geolocation.getCurrentPosition(userPosition)
-
-    
 })
 
 const userPosition = (success) => {
@@ -116,7 +93,7 @@ const userPosition = (success) => {
             if (result.status.name == "ok") {
                 let countryCode = result.data[0].properties.components;
                 let countryISO = countryCode["ISO_3166-1_alpha-2"]
-                // countryPainter(currentISO); // creates a polygon around the users country
+
                 $("#countrySelection").val(countryISO).change();
             }
         
@@ -128,16 +105,12 @@ const userPosition = (success) => {
     }); 
 }
 
-    
-
-
-    // retrieve country info and fly to country
-    // create marker for capitals
+// ON CHANGE EVENT //
 $("#countrySelection").on("change", ()=> {
     let currentISO = $('#countrySelection').val()
     // drop down menu border creation
     countryPainter(currentISO);
-    // wikiMarkers.clearLayers();
+    markerCluster.clearLayers();
     // get countries lat and from from country code
     $.ajax({
         url: "libs/php/getRestCountry.php",
@@ -202,8 +175,9 @@ $("#countrySelection").on("change", ()=> {
     
 });
 
-const countryPainter = (countryToFind) => {
+// AJAX FUNCTIONS
 
+const countryPainter = (countryToFind) => {
     $.ajax({
         url: "libs/php/getCountryBorders.php",
         type: 'POST',
@@ -217,13 +191,10 @@ const countryPainter = (countryToFind) => {
                 if(border){
                     map.removeLayer(border)
                 }
-                
                 border = L.geoJSON(result, borderStyle).addTo(map);
-
                 map.flyToBounds(border)
 
                 countryBounds = border.getBounds()
-                // country bounding box
                 countryBounds.north = countryBounds._northEast.lat
                 countryBounds.east = countryBounds._northEast.lng
                 countryBounds.south = countryBounds._southWest.lat
@@ -236,59 +207,6 @@ const countryPainter = (countryToFind) => {
         }
     }); 
 
-}
-
-const getLanguages = (target) => {
-
-    let newLanguages = "";
-    let max = Object.keys(target).length;
-
-    Object.keys(target).forEach((element, index) => {
-
-        if(index === 0 ){
-            newLanguages += `${target[element]}`
-        } else if (index === max - 1 || max === 1){
-            newLanguages += ` and ${target[element]}.`
-        } else {
-            newLanguages += `, ${target[element]}`
-        }
-    });
-
-    return newLanguages;
-
-};
-
-const getCurrency = (target) =>{
-    let currency;
-    Object.keys(target).forEach(element => {
-        currency = target[element].name
-    })
-    return currency;
-};
-
-const getDate = () => {
-    
-    let newDate = new Date;
-    let options = { weekday: 'long', day: 'numeric', month: 'long' }
-    let todaysDate = newDate.toLocaleDateString("en-GB", options).replace(/,/, '')
-    return todaysDate;
-
-}
-
-const createMarkers = (wiki) => {
-
-    for (let i = 0; i < wiki.length; i++) {
-        if(countryISO === wiki[i].countryCode){
-            markerCluster.addLayer(L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}))
-            context = L.popup()
-            .setLatLng([wiki[i].lat, wiki[i].lng])
-            .setContent(`<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`)
-            markerCluster.bindPopup(context)
-            map.addLayer(markerCluster)
-        } else {
-            continue; 
-        }
-    }
 }
 
 const getWeather = (capital) => {
@@ -340,7 +258,8 @@ const getExchange = (capitalName) => {
         
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            // your error code
+            console.log(textStatus);
+            console.log(errorThrown);
         }
     });
 }
@@ -370,5 +289,60 @@ const getWiki = (countryBounds) => {
     });
 }
 
+// HELPER FUNCTIONS
 
+const getLanguages = (target) => {
 
+    let newLanguages = "";
+    let max = Object.keys(target).length;
+
+    Object.keys(target).forEach((element, index) => {
+
+        if(index === 0 ){
+            newLanguages += `${target[element]}`
+        } else if (index === max - 1 || max === 1){
+            newLanguages += ` and ${target[element]}.`
+        } else {
+            newLanguages += `, ${target[element]}`
+        }
+    });
+
+    return newLanguages;
+
+};
+
+const getCurrency = (target) =>{
+    let currency;
+    Object.keys(target).forEach(element => {
+        currency = target[element].name
+    })
+    return currency;
+};
+
+const getDate = () => {
+    
+    let newDate = new Date;
+    let options = { weekday: 'long', day: 'numeric', month: 'long' }
+    let todaysDate = newDate.toLocaleDateString("en-GB", options).replace(/,/, '')
+    return todaysDate;
+
+}
+
+const createMarkers = (wiki) => {
+
+    for (let i = 0; i < wiki.length; i++) {
+
+        if(countryISO === wiki[i].countryCode){
+
+            marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}).addTo(markerCluster);
+            context = L.popup()
+            .setLatLng([wiki[i].lat, wiki[i].lng])
+            .setContent(`<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`)
+            marker.bindPopup(context)
+            map.addLayer(markerCluster)
+
+        } else {
+            continue; 
+        }
+    }
+}
