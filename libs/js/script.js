@@ -74,8 +74,18 @@ $(function(){
 })
 
 const userPosition = (success) => {
-    let userLatitude = success.coords.latitude
-    let userLongitude = success.coords.longitude
+
+    let userLatitude;
+    let userLongitude;
+// mouse click event checker
+    if("coords" in success){
+        userLatitude = success.coords.latitude
+        userLongitude = success.coords.longitude
+    } else {
+        userLatitude = success.latlng.lat
+        userLongitude = success.latlng.lng
+    }
+    
 
     $.ajax({
         url: "libs/php/getOpenCageByLatLng.php",
@@ -131,7 +141,6 @@ $("#countrySelection").on("change", ()=> {
                 let capitalLat =`${result.data[0].capitalInfo.latlng[0]}&#176;`;
                 let capitalLng = `${result.data[0].capitalInfo.latlng[1]}&#176;`;
                 let inlineStyle = 'style="display: block; text-align: center"'
-
                 markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
 
                 countryISO = result.data[0].cca2
@@ -139,7 +148,7 @@ $("#countrySelection").on("change", ()=> {
 
                     capitalPopup = L.popup()
                     .setLatLng(capitalLatLng)
-                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!</p><p ${inlineStyle}>${capitalLat},${capitalLng}</span></p>`)
+                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!</p><p ${inlineStyle}>${capitalLat}, ${capitalLng}</span></p>`)
                     .openOn(map);
 
                     markers.bindPopup(capitalPopup).openPopup();  
@@ -147,7 +156,7 @@ $("#countrySelection").on("change", ()=> {
 
                     capitalPopup = L.popup()
                     .setLatLng(capitalLatLng)
-                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p><p ${inlineStyle}">${capitalLat},${capitalLng}</p>`)
+                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p><p ${inlineStyle}">${capitalLat}, ${capitalLng}</p>`)
                     .openOn(map);
 
                     markers.bindPopup(capitalPopup).openPopup();
@@ -337,12 +346,12 @@ const createMarkers = (wiki) => {
     for (let i = 0; i < wiki.length; i++) {
 
         if(countryISO === wiki[i].countryCode){
-
+            let markerContent = `<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`;
             marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}).addTo(markerCluster);
 
             context = L.popup()
             .setLatLng([wiki[i].lat, wiki[i].lng])
-            .setContent(`<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`);
+            .setContent(markerContent);
 
             marker.bindPopup(context);
             map.addLayer(markerCluster);
@@ -352,3 +361,9 @@ const createMarkers = (wiki) => {
         }
     }
 };
+
+
+map.on('click', function(e) {
+    console.log(e.latlng);// ev is an event object (MouseEvent in this case)
+    userPosition(e)
+});

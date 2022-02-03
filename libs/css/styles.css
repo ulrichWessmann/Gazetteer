@@ -150,8 +150,10 @@ td.tableFont{
         display: none;
     }
     .leaflet-top.leaflet-left {
-        top: 53em;
-        left: 82%;
+        right: 10px;
+        top: auto;
+        left: auto;
+        bottom: 5em;
     }
 }
 /* desktop specific */
