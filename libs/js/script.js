@@ -25,10 +25,10 @@ var fontAwesomeIcon = L.icon({
     iconSize: [40, 40],
     popupAnchor: [0, -22],
 });
-const myIcon = L.divIcon({
-    html: '<i class="fas fa-landmark"></i>',
-    iconSize: [20, 20],
-    className: 'myDivIcon'
+const myIcon = L.icon({
+    iconUrl: 'libs/images/image.png',
+    iconSize:     [60, 60], 
+    popupAnchor:  [-3, -20] 
 });
 
 L.easyButton( '<i class="fas fa-info"></i>', function(){
@@ -218,7 +218,8 @@ const getWeather = (capital) => {
         capital: capital
     },
     success: function(result) {
-        
+        console.log(result.weather.weather[0].icon)
+        console.log(`http://openweathermap.org/img/wn/${result.weather.weather[0].icon}.png`)
         if (result.status.name == "ok") {
             weather = result.weather;
 
@@ -231,7 +232,7 @@ const getWeather = (capital) => {
             $("#tempMax").html(`${weather.main.temp_max}&#8451;`)
             $("#pressure").html(`${weather.main.pressure}`)
             $("#humidity").html(`${weather.main.humidity}&#37;`)
-            
+            $("#weatherImage").attr("src", `http://openweathermap.org/img/wn/${result.weather.weather[0].icon}.png`)
         }
     
     },

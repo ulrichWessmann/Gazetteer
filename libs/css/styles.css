@@ -52,11 +52,17 @@ body.preloader-site {
 .leaflet-bar.easy-button-container.leaflet-control {
     border-radius: 50%;
 }
-
-i.fas.fa-landmark{
-    font-size: 5em;
-    box-shadow: 0px 20px 20px 0px #ffffff6b;
+.leaflet-popup-content p {
+    margin: 18px 0;
+    text-align: center;
 }
+/* icons */
+/* 
+i.fas.fa-crown {
+    font-size: 3em;
+    color: gold;
+    box-shadow: 0px 20px 20px 0px #daa1056b;
+} */
 
 /* button container */
 .container-fluid.p-2 {
@@ -92,7 +98,7 @@ i.fas.fa-landmark{
     background-color: rgba(0,0,0,.0001) !important;
 }
 div.modal-content {
-    background-color: #ede7e7e3;
+    background-color: #b5b5b5;
     box-shadow: 0px 20px 6px 2px #0e02028a;
     border-radius: 50px 5px 50px 50px;
 }
@@ -104,7 +110,16 @@ p#condition{
 td.tableFont{
     text-align: end;
 }
-
+.border-bottom {
+    border-bottom: 1px solid #00000030 !important;
+}
+#weatherImage{
+    display: block;
+    margin: auto;
+}
+.hstack {
+    justify-content: center;
+}
 /* mobile styles */
 @media only screen and (max-width: 600px) {
     #countrySelection {
@@ -135,18 +150,20 @@ td.tableFont{
     div.modal-header {
         margin-left: 10px;
     }
-    button.easy-button-button.leaflet-bar-part.leaflet-interactive.unnamed-state-active{
-        margin: auto;
-    }
-    button.easy-button-button.leaflet-bar-part.leaflet-interactive.unnamed-state-active{
-        margin: auto;
-    }
     div.leaflet-popup-content {
         margin: 0px 10px;
         line-height: 1em;
         width: 200px;
     }
+    div.leaflet-control-zoom.leaflet-bar.leaflet-control {
+        display: none;
+    }
+    .leaflet-top.leaflet-left {
+        top: 55em;
+        left: 85%;
+    }
 }
+/* desktop specific */
 @media only screen and (min-width: 600px) {
     .container-fluid.p-2 {
         max-width: 300px;
