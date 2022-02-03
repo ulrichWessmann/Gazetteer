@@ -130,6 +130,7 @@ $("#countrySelection").on("change", ()=> {
                 let capitalLatLng = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]];
                 let capitalLat =`${result.data[0].capitalInfo.latlng[0]}&#176;`;
                 let capitalLng = `${result.data[0].capitalInfo.latlng[1]}&#176;`;
+                let inlineStyle = 'style="display: block; text-align: center"'
 
                 markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
 
@@ -138,7 +139,7 @@ $("#countrySelection").on("change", ()=> {
 
                     capitalPopup = L.popup()
                     .setLatLng(capitalLatLng)
-                    .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!</p><p style="display: block; text-align: center">${capitalLat},${capitalLng}</span></p>`)
+                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!</p><p ${inlineStyle}>${capitalLat},${capitalLng}</span></p>`)
                     .openOn(map);
 
                     markers.bindPopup(capitalPopup).openPopup();  
@@ -146,7 +147,7 @@ $("#countrySelection").on("change", ()=> {
 
                     capitalPopup = L.popup()
                     .setLatLng(capitalLatLng)
-                    .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p><p style="display: block; text-align: center">${capitalLat},${capitalLng}</p>`)
+                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p><p ${inlineStyle}">${capitalLat},${capitalLng}</p>`)
                     .openOn(map);
 
                     markers.bindPopup(capitalPopup).openPopup();

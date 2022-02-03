@@ -52,17 +52,8 @@ body.preloader-site {
 .leaflet-bar.easy-button-container.leaflet-control {
     border-radius: 50%;
 }
-.leaflet-popup-content p {
-    margin: 18px 0;
-    text-align: center;
-}
+
 /* icons */
-/* 
-i.fas.fa-crown {
-    font-size: 3em;
-    color: gold;
-    box-shadow: 0px 20px 20px 0px #daa1056b;
-} */
 
 /* button container */
 .container-fluid.p-2 {
