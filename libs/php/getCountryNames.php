@@ -7,8 +7,6 @@
 	$decode = json_decode($result,true);
 	$countries = [];
 	
-
-	
 	foreach ($decode["features"] as $object) {
 		array_push($countries, $object["properties"]);
 	}

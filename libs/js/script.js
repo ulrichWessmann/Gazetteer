@@ -19,7 +19,8 @@ let borderStyle = {
     "opacity": 0.15,
     "fillColor": "black",
     "fillOpacity": 0.3
-}
+};
+
 var fontAwesomeIcon = L.icon({
     iconUrl: 'libs/images/299087_marker_map_icon.png',
     iconSize: [40, 40],
@@ -56,9 +57,6 @@ $(function(){
     
             if (result.status.name == "ok") {
                 const data = result.data
-                // for(let i = data.length -1; i >= 0; i--){
-                //     $("#countrySelection").prepend(`<option value="${data[i].iso_a2}">${data[i].name}</option>`);
-                // }
                 data.forEach((country) => {
                     $("<option>", {
                         value: country.iso_a2,
@@ -72,7 +70,6 @@ $(function(){
             console.log(errorThrown);
         }
     });
-    // get users lat and long from browser
     navigator.geolocation.getCurrentPosition(userPosition)
 })
 
@@ -92,7 +89,7 @@ const userPosition = (success) => {
 
             if (result.status.name == "ok") {
                 let countryCode = result.data[0].properties.components;
-                let countryISO = countryCode["ISO_3166-1_alpha-2"]
+                let countryISO = countryCode["ISO_3166-1_alpha-2"];
 
                 $("#countrySelection").val(countryISO).change();
             }
@@ -108,9 +105,9 @@ const userPosition = (success) => {
 // ON CHANGE EVENT //
 $("#countrySelection").on("change", ()=> {
     let currentISO = $('#countrySelection').val()
-    // drop down menu border creation
     countryPainter(currentISO);
     markerCluster.clearLayers();
+
     // get countries lat and from from country code
     $.ajax({
         url: "libs/php/getRestCountry.php",
@@ -130,40 +127,46 @@ $("#countrySelection").on("change", ()=> {
                     map.removeLayer(markers);
                 }
                 // mark capitals
-                const capitalLatLng = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]]
+                let capitalLatLng = [result.data[0].capitalInfo.latlng[0], result.data[0].capitalInfo.latlng[1]];
+                let capitalLat =`${result.data[0].capitalInfo.latlng[0]}&#176;`;
+                let capitalLng = `${result.data[0].capitalInfo.latlng[1]}&#176;`;
+
                 markers =  L.marker(capitalLatLng, {icon: myIcon}).addTo(map);
 
                 countryISO = result.data[0].cca2
                 if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
+
                     capitalPopup = L.popup()
                     .setLatLng(capitalLatLng)
-                    .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
+                    .setContent(`<p>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!</p><p style="display: block; text-align: center">${capitalLat},${capitalLng}</span></p>`)
                     .openOn(map);
 
-                    markers.bindPopup(capitalPopup).openPopup()    
+                    markers.bindPopup(capitalPopup).openPopup();  
                 } else {
+
                     capitalPopup = L.popup()
                     .setLatLng(capitalLatLng)
-                    .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!<br/><span style="display: block; text-align: center">${capitalLatLng}</span></p>`)
+                    .setContent(`<p>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p><p style="display: block; text-align: center">${capitalLat},${capitalLng}</p>`)
                     .openOn(map);
 
-                    markers.bindPopup(capitalPopup).openPopup()   
-                }
+                    markers.bindPopup(capitalPopup).openPopup();
+                };
 
                 // get countries currency
                 Object.keys(restCountryData[0].currencies).forEach(element=> {
-                    currency = element
+                    currency = element;
                 })
                 
-                $("#country").html(`${restCountryData[0].name.common}`)
-                $("#continent").html(`${restCountryData[0].continents[0]}`)
-                $("#population").html((`${restCountryData[0].population}`).replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,"))
-                $("#languages").html(`${getLanguages(restCountryData[0].languages)}`)
-                $("#currency").html(`${getCurrency(restCountryData[0].currencies)}`)
+                $("#country").html(`${restCountryData[0].name.common}`);
+                $("#continent").html(`${restCountryData[0].continents[0]}`);
+                $("#population").html((`${restCountryData[0].population}`).replace( /\d{1,3}(?=(\d{3})+(?!\d))/g , "$&,"));
+                $("#languages").html(`${getLanguages(restCountryData[0].languages)}`);
+                $("#currency").html(`${getCurrency(restCountryData[0].currencies)}`);
 
-                getWeather(capitalName)
-                getExchange(capitalName)
-                getWiki(countryBounds)
+                // populate modals with information from API's
+                getWeather(capitalName);
+                getExchange(capitalName);
+                getWiki(countryBounds);
                 
             }
         },
@@ -192,13 +195,13 @@ const countryPainter = (countryToFind) => {
                     map.removeLayer(border)
                 }
                 border = L.geoJSON(result, borderStyle).addTo(map);
-                map.flyToBounds(border)
+                map.flyToBounds(border);
 
-                countryBounds = border.getBounds()
-                countryBounds.north = countryBounds._northEast.lat
-                countryBounds.east = countryBounds._northEast.lng
-                countryBounds.south = countryBounds._southWest.lat
-                countryBounds.west = countryBounds._southWest.lng
+                countryBounds = border.getBounds();
+                countryBounds.north = countryBounds._northEast.lat;
+                countryBounds.east = countryBounds._northEast.lng;
+                countryBounds.south = countryBounds._southWest.lat;
+                countryBounds.west = countryBounds._southWest.lng;
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -218,21 +221,20 @@ const getWeather = (capital) => {
         capital: capital
     },
     success: function(result) {
-        console.log(result.weather.weather[0].icon)
-        console.log(`http://openweathermap.org/img/wn/${result.weather.weather[0].icon}.png`)
         if (result.status.name == "ok") {
             weather = result.weather;
 
-            $("#capital").html(`${weather.name}`)
-            $("#condition").html(`${weather.weather[0].description}`)
-            $("#date").html(`${getDate()}`)
-            $("#temp").html(`${weather.main.temp}&#8451`)
-            $("#feelsLike").html(`${weather.main.feels_like}&#8451`)
-            $("#tempMin").html(`${weather.main.temp_min}&#8451;`)
-            $("#tempMax").html(`${weather.main.temp_max}&#8451;`)
-            $("#pressure").html(`${weather.main.pressure}`)
-            $("#humidity").html(`${weather.main.humidity}&#37;`)
-            $("#weatherImage").attr("src", `http://openweathermap.org/img/wn/${result.weather.weather[0].icon}.png`)
+            $("#capital").html(`${weather.name}`);
+            $("#condition").html(`${weather.weather[0].description}`);
+            $("#date").html(`${getDate()}`);
+            $("#temp").html(`${weather.main.temp}&#8451`);
+            $("#feelsLike").html(`${weather.main.feels_like}&#8451`);
+            $("#tempMin").html(`${weather.main.temp_min}&#8451;`);
+            $("#tempMax").html(`${weather.main.temp_max}&#8451;`);
+            $("#pressure").html(`${weather.main.pressure}`);
+            $("#humidity").html(`${weather.main.humidity}&#37;`);
+            $("#weatherImage").attr("src", `http://openweathermap.org/img/wn/${result.weather.weather[0].icon}.png`);
+
         }
     
     },
@@ -252,18 +254,18 @@ const getExchange = (capitalName) => {
             capital: capitalName
         },
         success: function(result) {
-            
+
             if (result.status.name == "ok") {
-                $("#exchange").html(`1 USD = ${result.currency.rates[currency]} ${currency}`)
+                $("#exchange").html(`1 USD = ${result.currency.rates[currency]} ${currency}`);
             }
-        
+
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus);
             console.log(errorThrown);
         }
     });
-}
+};
 
 const getWiki = (countryBounds) => {
     $.ajax({
@@ -288,7 +290,7 @@ const getWiki = (countryBounds) => {
             console.log(errorThrown);
         }
     });
-}
+};
 
 // HELPER FUNCTIONS
 
@@ -300,11 +302,11 @@ const getLanguages = (target) => {
     Object.keys(target).forEach((element, index) => {
 
         if(index === 0 ){
-            newLanguages += `${target[element]}`
+            newLanguages += `${target[element]}`;
         } else if (index === max - 1 || max === 1){
-            newLanguages += ` and ${target[element]}.`
+            newLanguages += ` and ${target[element]}.`;
         } else {
-            newLanguages += `, ${target[element]}`
+            newLanguages += `, ${target[element]}`;
         }
     });
 
@@ -315,7 +317,7 @@ const getLanguages = (target) => {
 const getCurrency = (target) =>{
     let currency;
     Object.keys(target).forEach(element => {
-        currency = target[element].name
+        currency = target[element].name;
     })
     return currency;
 };
@@ -323,11 +325,11 @@ const getCurrency = (target) =>{
 const getDate = () => {
     
     let newDate = new Date;
-    let options = { weekday: 'long', day: 'numeric', month: 'long' }
-    let todaysDate = newDate.toLocaleDateString("en-GB", options).replace(/,/, '')
+    let options = { weekday: 'long', day: 'numeric', month: 'long' };
+    let todaysDate = newDate.toLocaleDateString("en-GB", options).replace(/,/, '');
     return todaysDate;
 
-}
+};
 
 const createMarkers = (wiki) => {
 
@@ -336,14 +338,16 @@ const createMarkers = (wiki) => {
         if(countryISO === wiki[i].countryCode){
 
             marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}).addTo(markerCluster);
+
             context = L.popup()
             .setLatLng([wiki[i].lat, wiki[i].lng])
-            .setContent(`<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`)
-            marker.bindPopup(context)
-            map.addLayer(markerCluster)
+            .setContent(`<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`);
+
+            marker.bindPopup(context);
+            map.addLayer(markerCluster);
 
         } else {
             continue; 
         }
     }
-}
+};
