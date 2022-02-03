@@ -88,6 +88,9 @@ i.fas.fa-landmark{
 }
 
 /* modal styles */
+.modal-backdrop {
+    background-color: rgba(0,0,0,.0001) !important;
+}
 div.modal-content {
     background-color: #ede7e7e3;
     box-shadow: 0px 20px 6px 2px #0e02028a;
@@ -127,7 +130,7 @@ td.tableFont{
 
     button.btn-close.weather {
         height: 2.5em;
-        padding: 0.25em 17em;
+        padding-left: 180%;
     }
     div.modal-header {
         margin-left: 10px;
@@ -137,6 +140,11 @@ td.tableFont{
     }
     button.easy-button-button.leaflet-bar-part.leaflet-interactive.unnamed-state-active{
         margin: auto;
+    }
+    div.leaflet-popup-content {
+        margin: 0px 10px;
+        line-height: 1em;
+        width: 200px;
     }
 }
 @media only screen and (min-width: 600px) {
