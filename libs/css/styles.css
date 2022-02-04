@@ -115,6 +115,16 @@ td.tableFont{
 a {
     color: black !important;
 }
+div.modal-content.earthquake{
+    padding: 16px ;
+    max-width: 300px;
+}
+#earthquakeBox{
+    justify-content: center;
+}
+#quakeHeader {
+    padding: 8px;
+}
 /* mobile styles */
 @media only screen and (max-width: 600px) {
     #countrySelection {

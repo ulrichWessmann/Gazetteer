@@ -21,11 +21,18 @@ let borderStyle = {
     "fillOpacity": 0.3
 };
 
-var fontAwesomeIcon = L.icon({
+var mapPinIcon = L.icon({
     iconUrl: 'libs/images/299087_marker_map_icon.png',
     iconSize: [40, 40],
     popupAnchor: [0, -22],
 });
+
+var earthQuakeIcon = L.icon({
+    iconUrl: 'libs/images/crack.png',
+    iconSize: [40, 40],
+    popupAnchor: [0, -22],
+});
+
 const myIcon = L.icon({
     iconUrl: 'libs/images/image.png',
     iconSize:     [60, 60], 
@@ -186,6 +193,7 @@ $("#countrySelection").on("change", ()=> {
                 getWeather(capitalName);
                 getExchange(capitalName);
                 getWiki(countryBounds);
+                getEarthQuakes(countryBounds)
                 
             }
         },
@@ -221,6 +229,7 @@ const countryPainter = (countryToFind) => {
                 countryBounds.east = countryBounds._northEast.lng;
                 countryBounds.south = countryBounds._southWest.lat;
                 countryBounds.west = countryBounds._southWest.lng;
+                
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -311,6 +320,33 @@ const getWiki = (countryBounds) => {
     });
 };
 
+const getEarthQuakes = (countryBounds) => {
+    $.ajax({
+        url: "libs/php/getEarthQuakes.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            north: countryBounds.north,
+            south: countryBounds.south,
+            east: countryBounds.east,
+            west: countryBounds.west
+        },
+        success: function(result) {
+            if (result.status.name == "ok") {
+
+                let earthquakes = result.earthquakes;
+                createEarthQuakes(earthquakes);  
+                              
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+};
+
 // HELPER FUNCTIONS
 
 const getLanguages = (target) => {
@@ -355,30 +391,59 @@ const createMarkers = (wiki) => {
     for (let i = 0; i < wiki.length; i++) {
 
         if(countryISO === wiki[i].countryCode){
-            let wikiTitle = wiki[i].title
-            let wikiSummary = wiki[i].summary
-            let wikipediaUrl = wiki[i].wikipediaUrl
+            let wikiTitle = wiki[i].title;
+            let wikiSummary = wiki[i].summary;
+            let wikipediaUrl = wiki[i].wikipediaUrl;
 
             marker = L.marker([wiki[i].lat, wiki[i].lng], {
-                icon: fontAwesomeIcon
+                icon: mapPinIcon
             }).on("click", createModal);
 
             function createModal(e){
-                console.log("hello there")
 
-                $("#wikiTitle").html(`${wikiTitle}`)
-                $("#wikiSummary").html(`${wikiSummary}`)
-                $("#wikiURL").html(`<a href="https://${wikipediaUrl}">Read more...<a>`)
+                $("#wikiTitle").html(`${wikiTitle}`);
+                $("#wikiSummary").html(`${wikiSummary}`);
+                $("#wikiURL").html(`<a href="https://${wikipediaUrl}">Read more...<a>`);
 
-                $("#myWikiModal").modal("show")
+                $("#myWikiModal").modal("show");
             };
 
-            marker.addTo(markerCluster)
-            map.addLayer(markerCluster)
+            marker.addTo(markerCluster);
+            map.addLayer(markerCluster);
 
         } else {
             continue; 
         }
+    }
+};
+
+const createEarthQuakes = (array) => {
+
+    for (let i = 0; i < array.length; i++) {
+        
+        let quakeMagnitude = array[i].magnitude;
+        let htmlDate = array[i].datetime.slice(0, 10).replace(/-/g, ",");
+        let options = { day: 'numeric', month: 'long', year: 'numeric' };
+        let newDate = new Date(htmlDate);
+        let quakeDate = newDate.toLocaleDateString("en-GB", options);
+        let quakeDepth = array[i].depth;
+
+        marker = L.marker([array[i].lat, array[i].lng], {
+            icon: earthQuakeIcon
+        }).on("click", createModal);
+
+        function createModal(e){
+
+            $("#quakeMagnitude").html(`${quakeMagnitude} M<sub>L</sub>`);
+            $("#quakeDate").html(`${quakeDate}`);
+            $("#quakeDepth").html(`${quakeDepth}km`);
+
+            $("#myQuakeModal").modal("show");
+        };
+
+        marker.addTo(markerCluster);
+        map.addLayer(markerCluster);
+
     }
 };
 
