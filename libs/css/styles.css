@@ -89,9 +89,10 @@ body.preloader-site {
     background-color: rgba(0,0,0,.0001) !important;
 }
 div.modal-content {
-    background-color: #b5b5b5;
+    background-color: #fcfefc;
     box-shadow: 0px 20px 6px 2px #0e02028a;
     border-radius: 50px 5px 50px 50px;
+    border: 6px solid gray;
 }
 
 p#condition{
@@ -110,6 +111,9 @@ td.tableFont{
 }
 .hstack {
     justify-content: center;
+}
+a {
+    color: black !important;
 }
 /* mobile styles */
 @media only screen and (max-width: 600px) {
@@ -140,6 +144,10 @@ td.tableFont{
     }
     div.modal-header {
         margin-left: 10px;
+    }
+
+    div.modal-content.weather{
+        max-height: 70%;
     }
     div.leaflet-popup-content {
         margin: 0px 10px;
@@ -173,5 +181,15 @@ td.tableFont{
     }
     div.col.hstack{
         justify-content: center;
+    }
+    #wikiTitle {
+        width: 100%;
+        padding-right: var(--bs-gutter-x, 0.75rem);
+        padding-left: var(--bs-gutter-x, 0.75rem);
+        margin-right: auto;
+        margin-left: auto;
+    }
+    p#wikiSummary{
+        padding-top: 16px;
     }
 }

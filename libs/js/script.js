@@ -252,7 +252,7 @@ const getWeather = (capital) => {
             $("#tempMax").html(`${weather.main.temp_max}&#8451;`);
             $("#pressure").html(`${weather.main.pressure}`);
             $("#humidity").html(`${weather.main.humidity}&#37;`);
-            $("#weatherImage").attr("src", `http://openweathermap.org/img/wn/${result.weather.weather[0].icon}.png`);
+            $("#weatherImage").attr("src", `libs/images/weather-conditions/${result.weather.weather[0].icon}.png`);
 
         }
     
@@ -355,15 +355,26 @@ const createMarkers = (wiki) => {
     for (let i = 0; i < wiki.length; i++) {
 
         if(countryISO === wiki[i].countryCode){
-            let markerContent = `<p><b>${wiki[i].title}</b></p><p>Summary:</p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`;
-            marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: fontAwesomeIcon}).addTo(markerCluster);
+            let wikiTitle = wiki[i].title
+            let wikiSummary = wiki[i].summary
+            let wikipediaUrl = wiki[i].wikipediaUrl
 
-            context = L.popup()
-            .setLatLng([wiki[i].lat, wiki[i].lng])
-            .setContent(markerContent);
+            marker = L.marker([wiki[i].lat, wiki[i].lng], {
+                icon: fontAwesomeIcon
+            }).on("click", createModal);
 
-            marker.bindPopup(context);
-            map.addLayer(markerCluster);
+            function createModal(e){
+                console.log("hello there")
+
+                $("#wikiTitle").html(`${wikiTitle}`)
+                $("#wikiSummary").html(`${wikiSummary}`)
+                $("#wikiURL").html(`<a href="https://${wikipediaUrl}">Read more...<a>`)
+
+                $("#myWikiModal").modal("show")
+            };
+
+            marker.addTo(markerCluster)
+            map.addLayer(markerCluster)
 
         } else {
             continue; 
