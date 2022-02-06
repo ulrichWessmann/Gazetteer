@@ -218,14 +218,14 @@ $("#countrySelection").on("change", ()=> {
                 // populate modals with information from API's
                 console.log(restCountryData[0].name.common.replace(/ +/g, ""))
                 getWeather(capitalName);
-                getExchange(capitalName);
+                // getExchange(capitalName);
                 getWiki(countryBounds);
-                getEarthQuakes(countryBounds)
-                getWindyCameras(countryISO)
-                getHolidays(countryISO)
-                getCountryPhotos(restCountryData[0].name.common.replace(/ +/g, ""))
-                getCovidData()
-                getNews()
+                // getEarthQuakes(countryBounds)
+                // getWindyCameras(countryISO)
+                // getHolidays(countryISO)
+                // getCountryPhotos(restCountryData[0].name.common.replace(/ +/g, ""))
+                // getCovidData()
+                // getNews()
                 console.log(capitalLatLng)
             }
         },
@@ -744,7 +744,7 @@ const createMarkers = (wiki) => {
             marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: mapPinIcon}).addTo(markerCluster);
             context = L.popup()
             .setLatLng([wiki[i].lat, wiki[i].lng])
-            .setContent(`<p><b>${wiki[i].title}</b></p><p></p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`)
+            .setContent(`<p><b>${wiki[i].title}</b></p><p></p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}" target="_blank">Read more...<a></p><p></p>`)
             marker.bindPopup(context)
             map.addLayer(markerCluster)
 
