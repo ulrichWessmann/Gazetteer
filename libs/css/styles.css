@@ -191,7 +191,11 @@ div.modal-content.earthquake{
     .modal-dialog-scrollable .modal-content {
     max-height: 80%;
     overflow: hidden;
-}
+    }
+    /* cards mobile screen flex wrap hard code */
+    .card-columns.d-flex{
+        flex-wrap: wrap !important;
+    }
 }
 /* desktop specific */
 @media only screen and (min-width: 600px) {
@@ -225,8 +229,12 @@ div.modal-content.earthquake{
     #photoContainer{
         min-width: 1046px;
     }
+    /* #newsModal {
+    max-width: 1000px;
+} */
 }
 
 .w-100.shadow-1-strong.rounded.mb-4 {
     max-height: 250px !important;
 }
+

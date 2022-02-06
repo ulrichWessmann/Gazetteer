@@ -57,7 +57,7 @@ let borderStyle = {
     "fillOpacity": 0.3
 };
 
-
+// EASY BUTTONS //
 
 L.easyButton( '<i class="fas fa-info"></i>', function(){
     $("#myModal").modal("show")
@@ -67,16 +67,20 @@ L.easyButton( '<i class="fas fa-cloud-sun"></i>', function(){
 $("#myModalWeather").modal("show")
 }).addTo(map);
 
-L.easyButton( '<i class="fas fa-building"></i>', function(){
+L.easyButton( '<i class="fas fa-calendar-alt"></i>', function(){
 $("#myCaleandarModal").modal("show")
 }).addTo(map);
 
-L.easyButton( '<i class="fas fa-coffee"></i>', function(){
+L.easyButton( '<i class="fas fa-camera"></i>', function(){
 $("#myPhotoModal").modal("show")
 }).addTo(map);
 
 L.easyButton( '<i class="fas fa-virus"></i>', function(){
 $("#myCoronaModal").modal("show")
+}).addTo(map);
+
+L.easyButton( '<i class="fas fa-newspaper"></i>', function(){
+$("#myNewsModal").modal("show")
 }).addTo(map);
 
 // PRELOADER //
@@ -162,7 +166,7 @@ $("#countrySelection").on("change", ()=> {
     let currentISO = $('#countrySelection').val()
     countryPainter(currentISO);
     markerCluster.clearLayers();
-
+    
     // get countries lat and from from country code
     $.ajax({
         url: "libs/php/getRestCountry.php",
@@ -221,6 +225,8 @@ $("#countrySelection").on("change", ()=> {
                 getHolidays(countryISO)
                 getCountryPhotos(restCountryData[0].name.common.replace(/ +/g, ""))
                 getCovidData()
+                getNews()
+                console.log(capitalLatLng)
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -228,7 +234,6 @@ $("#countrySelection").on("change", ()=> {
             console.log(errorThrown);
         }
     }); 
-    
 });
 
 // AJAX FUNCTIONS
@@ -393,7 +398,9 @@ const getWindyCameras = () => {
                     context = L.popup()
                     .setLatLng([[cameras[i].location.latitude, cameras[i].location.longitude]])
                     .setContent(`<p><b>${cameras[i].title}</b></p><p><iframe src="${cameras[i].player.day.embed}" ></p>`)
-                    marker.bindPopup(context)
+                    marker.bindPopup(context, {
+                        minWidth: 320
+                        })
                     map.addLayer(markerCluster)
                 }
             }
@@ -466,33 +473,29 @@ const getCountryPhotos = (capitalName) => {
 
                 let images = result.images.results
                 $("#photo1").attr({
-                    src: `${images[0].urls.full}`,
+                    src: `${images[0].urls.small}`,
                     alt: `${images[0].alt_description}`,
                 });
                 $("#photo2").attr({
-                    src: `${images[1].urls.full}`,
+                    src: `${images[1].urls.small}`,
                     alt: `${images[1].alt_description}`,
                 });
                 $("#photo3").attr({
-                    src: `${images[2].urls.full}`,
+                    src: `${images[2].urls.small}`,
                     alt: `${images[2].alt_description}`,
                 });
                 $("#photo4").attr({
-                    src: `${images[3].urls.full}`,
+                    src: `${images[3].urls.small}`,
                     alt: `${images[3].alt_description}`,
                 });
                 $("#photo5").attr({
-                    src: `${images[4].urls.full}`,
+                    src: `${images[4].urls.small}`,
                     alt: `${images[4].alt_description}`,
                 });
 
                 $("#photo6").attr({
-                    src: `${images[5].urls.full}`,
+                    src: `${images[5].urls.small}`,
                     alt: `${images[5].alt_description}`,
-                });
-                $("#photo6").attr({
-                    src: `${images[6].urls.full}`,
-                    alt: `${images[6].alt_description}`,
                 });
                 // images.forEach((element, index) => {
                 //     console.log(element)
@@ -535,6 +538,156 @@ const getCovidData = () => {
                 $("#perMillion").html(covid.latest_data.calculated.cases_per_million_population)
                 $("#deathRate").html(covid.latest_data.calculated.death_rate.toString().slice(0,4))
                 $("#recoveryRate").html(covid.latest_data.calculated.recovery_rate.toString().slice(0,5))
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+}
+const getNews = () => {
+    $.ajax({
+        url: "libs/php/getNews.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            country: countryISO,
+        },
+        success: function(result) {
+
+            if (result.status.name == "ok") {
+                let news = result.news.articles
+                if($("#firstColumn")){
+                    $("#firstColumn").remove()
+                    $("#secondColumn").remove()
+                }
+                if(result.news.totalResults === 0 || result.news.status === "error"){
+
+                   $("#newsModalLable").html("No news for this country")
+
+                } else {
+                    // create containers dynamically
+                    $("#newsArticles").append('<div class="card-columns d-flex" id="firstColumn">')
+                    $("#newsArticles").append('<div class="card-columns d-flex" id="secondColumn">')
+                    // first card
+                    $("#firstColumn").append(
+                        `<div class="card col-lg-4 col-md-6 col-sm-12">
+                            <img class="card-img-top" ${checkForImage(news[0])}">
+                            <div class="card-body" id>
+                                <h5 class="card-title">${news[0].title}</h5>
+                                <p class="card-text description">${news[0].description}</p>
+                                <p class="card-text link"><small class="text-muted"></small></p>
+                            </div>
+                        </div>`)
+
+                    $("#firstColumn").append(
+                        `<div class="card col-lg-4 col-md-6 col-sm-12">
+                            <img class="card-img-top" ${checkForImage(news[1])}">
+                            <div class="card-body" id>
+                                <h5 class="card-title">${news[1].title}</h5>
+                                <p class="card-text description">${news[1].description}</p>
+                                <p class="card-text link"><small class="text-muted"></small></p>
+                            </div>
+                        </div>`)
+
+                    $("#firstColumn").append(
+                        `<div class="card col-lg-4 col-md-6 col-sm-12">
+                            <img class="card-img-top" ${checkForImage(news[2])}">
+                            <div class="card-body" id>
+                                <h5 class="card-title">${news[2].title}</h5>
+                                <p class="card-text description">${news[2].description}</p>
+                                <p class="card-text link"><small class="text-muted"></small></p>
+                            </div>
+                        </div>`)
+                        // second column
+                    $("#secondColumn").append(
+                        `<div class="card col-lg-4 col-md-6 col-sm-12">
+                            <img class="card-img-top" ${checkForImage(news[3])}}">
+                            <div class="card-body" id>
+                                <h5 class="card-title">${news[3].title}</h5>
+                                <p class="card-text description">${news[3].description}</p>
+                                <p class="card-text link"><small class="text-muted"></small></p>
+                            </div>
+                        </div>`)
+
+                    $("#secondColumn").append(
+                        `<div class="card col-lg-4 col-md-6 col-sm-12" id="newsOne">
+                            <img class="card-img-top" ${checkForImage(news[4])}">
+                            <div class="card-body" id>
+                                <h5 class="card-title">${news[4].title}</h5>
+                                <p class="card-text description">${news[4].description}</p>
+                                <p class="card-text link"><small class="text-muted"></small></p>
+                            </div>
+                        </div>`)
+
+                    $("#secondColumn").append(
+                        `<div class="card col-lg-4 col-md-6 col-sm-12" id="newsOne">
+                            <img class="card-img-top" ${checkForImage(news[5])}">
+                            <div class="card-body" id>
+                                <h5 class="card-title">${news[5].title}</h5>
+                                <p class="card-text description">${news[5].description}</p>
+                                <p class="card-text link"><small class="text-muted"></small></p>
+                            </div>
+                        </div>`)
+                }
+                
+
+                // if(news[0].urlToImage){
+                //     $("#newsOne img").attr("src", `${news[0].urlToImage}`)   
+                // } else {
+                //     $("#newsOne img").attr("src", `""`)
+                // }
+                // if(news[1].urlToImage){
+                //     $("#newsTwo img").attr("src", `${news[1].urlToImage}`)   
+                // } else {
+                //     $("#newsTwo img").attr("src", `""`)
+                // }
+                // if(news[2].urlToImage){
+                //     $("#newsThree img").attr("src", `${news[2].urlToImage}`)   
+                // } else {
+                //     $("#newsThree img").attr("src", `""`)
+                // }
+                // if(news[3].urlToImage){
+                //     $("#newsFour img").attr("src", `${news[3].urlToImage}`)   
+                // } else {
+                //     $("#newsFour img").attr("src", `""`)
+                // }
+                // if(news[4].urlToImage){
+                //     $("#newsFive img").attr("src", `${news[4].urlToImage}`)   
+                // } else {
+                //     $("#newsFive img").attr("src", `""`)
+                // }
+                // if(news[5].urlToImage){
+                //     $("#newsSix img").attr("src", `${news[5].urlToImage}`)   
+                // } else {
+                //     $("#newsSix img").attr("src", `""`)
+                // }
+                
+                // $("#newsOne h5").html(`${news[0].title}`)
+                // $("#newsOne p.description").html(`${news[0].description}`)
+                // $("#newsOne p.link").html(`<a href="${news[0].url}" target="_blank">Read more...<a>`)
+                // // two
+                // $("#newsTwo h5").html(`${news[1].title}`)
+                // $("#newsTwo p.description").html(`${news[1].description}`)
+                // $("#newsTwo p.link").html(`<a href="${news[1].url}" target="_blank">Read more...<a>`)
+                // // three
+                // $("#newsThree h5").html(`${news[2].title}`)
+                // $("#newsThree p.description").html(`${news[2].description}`)
+                // $("#newsThree p.link").html(`<a href="${news[2].url}" target="_blank">Read more...<a>`)
+                // // four
+                // $("#newsFour h5").html(`${news[3].title}`)
+                // $("#newsFour p.description").html(`${news[3].description}`)
+                // $("#newsFour p.link").html(`<a href="${news[3].url}" target="_blank">Read more...<a>`)
+                // // five
+                // $("#newsFive h5").html(`${news[4].title}`)
+                // $("#newsFive p.description").html(`${news[4].description}`)
+                // $("#newsFive p.link").html(`<a href="${news[4].url}" target="_blank">Read more...<a>`)
+                // // six
+                // $("#newsSix h5").html(`${news[5].title}`)
+                // $("#newsSix p.description").html(`${news[5].description}`)
+                // $("#newsSix p.link").html(`<a href="${news[5].url}" target="_blank">Read more...<a>`)
             }
         
         },
@@ -617,10 +770,11 @@ const createEarthQuakes = (array) => {
             }).addTo(markerCluster);
             context = L.popup()
             .setLatLng([array[i].lat, array[i].lng])
-            .setContent(`<p><b>Earth quake</sub></p><p>${quakeMagnitude}</b>M<sub>L</p><p>${quakeDate}</p><p>${quakeDepth}km</p>`)
+            .setContent(`<p><b>Strength:</b> ${quakeMagnitude}</b>M<sub>L</p><p><b>Depth:</b> ${quakeDepth}km</p><p>${quakeDate}</p>`)
             marker.bindPopup(context)
             map.addLayer(markerCluster)
 
+            
         // marker = L.marker([array[i].lat, array[i].lng], {
         //     icon: mapPinIcon
         // }).on("click", createModal);
@@ -638,5 +792,15 @@ const createEarthQuakes = (array) => {
         // map.addLayer(markerCluster);
 
     }
+};
+
+const checkForImage = (array) => {
+    imageTag = ""
+    if(array.urlToImage) {
+        imageTag = `src="${array.urlToImage}" alt="${array.description}"`;
+    } else {
+        imageTag = 'src="" alt="No image to display"';
+    }
+    return imageTag;
 };
 
