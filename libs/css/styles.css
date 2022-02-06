@@ -94,6 +94,18 @@ div.modal-content {
     border-radius: 50px 5px 50px 50px;
     border: 6px solid gray;
 }
+.modal-header.no-border{
+    border-bottom: none;
+}
+
+.modal-body.text-white, .container-fluid.resize{
+    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.table-striped td.fw-bold{
+    padding-left: 1em
+}
 
 p#condition{
     text-align: center;
@@ -102,8 +114,8 @@ p#condition{
 td.tableFont{
     text-align: end;
 }
-.border-bottom {
-    border-bottom: 1px solid #00000030 !important;
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: rgba(155, 155, 155, 0.178);
 }
 #weatherImage{
     display: block;
@@ -149,11 +161,8 @@ div.modal-content.earthquake{
     }
 
     button.btn-close.weather {
-        height: 2.5em;
-        padding-left: 180%;
-    }
-    div.modal-header {
-        margin-left: 10px;
+        padding: 0.5rem 0.5rem;
+        margin: 0.5rem 0.5rem 0.5rem auto;
     }
 
     div.modal-content.weather{
@@ -173,21 +182,28 @@ div.modal-content.earthquake{
         left: auto;
         bottom: 5em;
     }
+    #holidaySize{
+        max-height: 50%;
+    }
+    #photoContainer{
+        max-height: 50%;
+    }
+    .modal-dialog-scrollable .modal-content {
+    max-height: 80%;
+    overflow: hidden;
+}
 }
 /* desktop specific */
 @media only screen and (min-width: 600px) {
     .container-fluid.p-2 {
         max-width: 300px;
     }
-    span#country{
-        padding-left: 20px;
-    }
     div.modal-body.text-black{
         padding-top: 0px;
     }
     button.btn-close.weather{
         padding: 0.5rem 0.5rem;
-        margin: -1.5rem 0.5rem 0.5rem auto;
+        margin: 0.5rem 0.5rem 0.5rem auto;
     }
     div.col.hstack{
         justify-content: center;
@@ -202,4 +218,15 @@ div.modal-content.earthquake{
     p#wikiSummary{
         padding-top: 16px;
     }
+    #informationModal{
+        max-width: 300px;
+        margin: 1.75rem auto;
+    }
+    #photoContainer{
+        min-width: 1046px;
+    }
+}
+
+.w-100.shadow-1-strong.rounded.mb-4 {
+    max-height: 250px !important;
 }

@@ -2,6 +2,7 @@ let capitalPopup;
 let currency;
 let countryBounds;
 let countryISO;
+let newDate = new Date;
 
 let defaultView = [51.505, -0.09];
 let map = L.map('map').setView(defaultView, 4);
@@ -10,8 +11,43 @@ attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Int
 })
 .addTo(map);
 
+
+// MARKERS
 let markers;
-var markerCluster = L.markerClusterGroup();
+var markerCluster = L.markerClusterGroup({
+    maxClusterRadius: 30
+});
+var mapPinIcon = L.ExtraMarkers.icon({
+    shape: 'square',
+    markerColor: 'yellow',
+    prefix: 'fa',
+    icon: 'fa-star',
+    iconColor: '#fff',
+});
+
+var mapCameraIcon = L.ExtraMarkers.icon({
+    shape: 'square',
+    markerColor: 'red',
+    prefix: 'fa',
+    icon: 'fa-video',
+    iconColor: '#fff',
+  });
+var earthQuakeIcon = L.ExtraMarkers.icon({
+    shape: 'square',
+    markerColor: 'black',
+    prefix: 'fa',
+    icon: 'fa-house-damage',
+    iconColor: '#fff',
+});
+
+var myIcon = L.ExtraMarkers.icon({
+    shape: 'square',
+    markerColor: 'white',
+    prefix: 'fa',
+    icon: 'fa-city',
+    iconColor: '#000',
+});
+
 let border;
 let borderStyle = {
     "color": "red",
@@ -21,23 +57,7 @@ let borderStyle = {
     "fillOpacity": 0.3
 };
 
-var mapPinIcon = L.icon({
-    iconUrl: 'libs/images/299087_marker_map_icon.png',
-    iconSize: [40, 40],
-    popupAnchor: [0, -22],
-});
 
-var earthQuakeIcon = L.icon({
-    iconUrl: 'libs/images/crack.png',
-    iconSize: [40, 40],
-    popupAnchor: [0, -22],
-});
-
-const myIcon = L.icon({
-    iconUrl: 'libs/images/image.png',
-    iconSize:     [60, 60], 
-    popupAnchor:  [-3, -20] 
-});
 
 L.easyButton( '<i class="fas fa-info"></i>', function(){
     $("#myModal").modal("show")
@@ -45,6 +65,18 @@ L.easyButton( '<i class="fas fa-info"></i>', function(){
 
 L.easyButton( '<i class="fas fa-cloud-sun"></i>', function(){
 $("#myModalWeather").modal("show")
+}).addTo(map);
+
+L.easyButton( '<i class="fas fa-building"></i>', function(){
+$("#myCaleandarModal").modal("show")
+}).addTo(map);
+
+L.easyButton( '<i class="fas fa-coffee"></i>', function(){
+$("#myPhotoModal").modal("show")
+}).addTo(map);
+
+L.easyButton( '<i class="fas fa-virus"></i>', function(){
+$("#myCoronaModal").modal("show")
 }).addTo(map);
 
 // PRELOADER //
@@ -142,6 +174,7 @@ $("#countrySelection").on("change", ()=> {
         success: function(result) {
             let capitalName = result.data[0].capital[0];
             let restCountryData = result.data
+            console.log(capitalName)
 
             if (result.status.name == "ok") {
                 
@@ -158,25 +191,14 @@ $("#countrySelection").on("change", ()=> {
                     icon: myIcon,
 
                 }).addTo(map);
-
                 countryISO = result.data[0].cca2
-                if(countryISO === "GB" || countryISO === "US" || countryISO === "NL"){
-
-                    capitalPopup = L.popup()
-                    .setLatLng(capitalLatLng)
-                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of the ${result.data[0].name.common}!</p><p ${inlineStyle}>${capitalLat}, ${capitalLng}</span></p>`)
-                    .openOn(map);
-
-                    markers.bindPopup(capitalPopup).openPopup();  
-                } else {
-
-                    capitalPopup = L.popup()
-                    .setLatLng(capitalLatLng)
-                    .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]} is the capital of ${result.data[0].name.common}!</p><p ${inlineStyle}">${capitalLat}, ${capitalLng}</p>`)
-                    .openOn(map);
+                
+                capitalPopup = L.popup()
+                .setLatLng(capitalLatLng)
+                .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]}</p><p ${inlineStyle}>${capitalLat}, ${capitalLng}</span></p>`)
+                .openOn(map);
 
                     markers.bindPopup(capitalPopup).openPopup();
-                };
 
                 // get countries currency
                 Object.keys(restCountryData[0].currencies).forEach(element=> {
@@ -190,11 +212,15 @@ $("#countrySelection").on("change", ()=> {
                 $("#currency").html(`${getCurrency(restCountryData[0].currencies)}`);
 
                 // populate modals with information from API's
+                console.log(restCountryData[0].name.common.replace(/ +/g, ""))
                 getWeather(capitalName);
                 getExchange(capitalName);
                 getWiki(countryBounds);
                 getEarthQuakes(countryBounds)
-                
+                getWindyCameras(countryISO)
+                getHolidays(countryISO)
+                getCountryPhotos(restCountryData[0].name.common.replace(/ +/g, ""))
+                getCovidData()
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -254,7 +280,7 @@ const getWeather = (capital) => {
 
             $("#capital").html(`${weather.name}`);
             $("#condition").html(`${weather.weather[0].description}`);
-            $("#date").html(`${getDate()}`);
+            $("#date").html(`${getDate(newDate, { weekday: 'long', day: 'numeric', month: 'long' })}`);
             $("#temp").html(`${weather.main.temp}&#8451`);
             $("#feelsLike").html(`${weather.main.feels_like}&#8451`);
             $("#tempMin").html(`${weather.main.temp_min}&#8451;`);
@@ -347,6 +373,178 @@ const getEarthQuakes = (countryBounds) => {
     });
 };
 
+const getWindyCameras = () => {
+    $.ajax({
+        url: "libs/php/getWindyCameras.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            country: countryISO,
+            
+        },
+        success: function(result) {
+        
+            if (result.status.name == "ok") {
+
+                let cameras = result.cameras.result.webcams;
+                for (let i = 0; i < cameras.length; i++) {
+
+                    marker = L.marker([cameras[i].location.latitude, cameras[i].location.longitude], {icon: mapCameraIcon}).addTo(markerCluster);
+                    context = L.popup()
+                    .setLatLng([[cameras[i].location.latitude, cameras[i].location.longitude]])
+                    .setContent(`<p><b>${cameras[i].title}</b></p><p><iframe src="${cameras[i].player.day.embed}" ></p>`)
+                    marker.bindPopup(context)
+                    map.addLayer(markerCluster)
+                }
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+}
+
+const getHolidays = () => {
+    $.ajax({
+        url: "libs/php/getHolidays.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            country: countryISO,
+            
+        },
+        success: function(result) {
+            
+            if (result.status.name == "ok") {
+                var events = []
+                let holidays = result.holidays.holidays
+                if($("#holidayName")){
+                    $("#holidayName").remove()
+                }
+                $("#getTable").prepend('<tbody id="holidayName"></tbody class="">')
+
+                holidays.forEach(element => {
+                    if(element.public === true){
+                        date = new Date(element.date)
+
+                        // //use this
+                        // images.forEach(element => {
+                        //     console.log(element)
+                        //     $("#photos").append("<div id='photosContainer' class='row'></div>");
+                        //     $("#photosContainer").append($())
+                        // })
+                        //
+                        let elementName = `<tr><td><b>${element.name}</b></td>`
+                        let elementDate = `<td>${getDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}</td></tr>`
+                        $("#holidayName").append(elementName + elementDate)
+                    }
+                });
+
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+}
+const getCountryPhotos = (capitalName) => {
+    $.ajax({
+        url: "libs/php/getCountryPhotos.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            capital: capitalName,
+            
+        },
+        success: function(result) {
+            
+            if (result.status.name == "ok") {
+
+                let images = result.images.results
+                $("#photo1").attr({
+                    src: `${images[0].urls.full}`,
+                    alt: `${images[0].alt_description}`,
+                });
+                $("#photo2").attr({
+                    src: `${images[1].urls.full}`,
+                    alt: `${images[1].alt_description}`,
+                });
+                $("#photo3").attr({
+                    src: `${images[2].urls.full}`,
+                    alt: `${images[2].alt_description}`,
+                });
+                $("#photo4").attr({
+                    src: `${images[3].urls.full}`,
+                    alt: `${images[3].alt_description}`,
+                });
+                $("#photo5").attr({
+                    src: `${images[4].urls.full}`,
+                    alt: `${images[4].alt_description}`,
+                });
+
+                $("#photo6").attr({
+                    src: `${images[5].urls.full}`,
+                    alt: `${images[5].alt_description}`,
+                });
+                $("#photo6").attr({
+                    src: `${images[6].urls.full}`,
+                    alt: `${images[6].alt_description}`,
+                });
+                // images.forEach((element, index) => {
+                //     console.log(element)
+                //     console.log(index)
+                //     $(`#photo${[index]}`).attr({
+                //         src: `${images.urls.regular}`,
+                //         title: `${images.description}`,
+                //         alt: `${images.alt_description}`,
+                //         class: "w-100 shadow-1-strong rounded mb-4"
+                //       });
+                // })
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+}
+const getCovidData = () => {
+    $.ajax({
+        url: "libs/php/getCovidData.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            country: countryISO,
+        },
+        success: function(result) {
+
+            // let result.covid.data = covid;
+            if (result.status.name == "ok") {
+                let covid = result.covid.data;
+                console.log(covid)
+                $("#totalDeaths").html(covid.latest_data.deaths)
+                $("#todayDeaths").html(covid.today.confirmed)
+                $("#totalConfirmed").html(covid.latest_data.confirmed)
+                $("#todayConfirmed").html(covid.today.confirmed)
+                $("#totalRecovered").html(covid.latest_data.recovered)
+                $("#perMillion").html(covid.latest_data.calculated.cases_per_million_population)
+                $("#deathRate").html(covid.latest_data.calculated.death_rate.toString().slice(0,4))
+                $("#recoveryRate").html(covid.latest_data.calculated.recovery_rate.toString().slice(0,5))
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+}
+
 // HELPER FUNCTIONS
 
 const getLanguages = (target) => {
@@ -377,11 +575,9 @@ const getCurrency = (target) =>{
     return currency;
 };
 
-const getDate = () => {
-    
-    let newDate = new Date;
-    let options = { weekday: 'long', day: 'numeric', month: 'long' };
-    let todaysDate = newDate.toLocaleDateString("en-GB", options).replace(/,/, '');
+const getDate = (date, options) => {
+
+    let todaysDate = date.toLocaleDateString("en-GB", options).replace(/,/, '');
     return todaysDate;
 
 };
@@ -391,25 +587,13 @@ const createMarkers = (wiki) => {
     for (let i = 0; i < wiki.length; i++) {
 
         if(countryISO === wiki[i].countryCode){
-            let wikiTitle = wiki[i].title;
-            let wikiSummary = wiki[i].summary;
-            let wikipediaUrl = wiki[i].wikipediaUrl;
 
-            marker = L.marker([wiki[i].lat, wiki[i].lng], {
-                icon: mapPinIcon
-            }).on("click", createModal);
-
-            function createModal(e){
-
-                $("#wikiTitle").html(`${wikiTitle}`);
-                $("#wikiSummary").html(`${wikiSummary}`);
-                $("#wikiURL").html(`<a href="https://${wikipediaUrl}">Read more...<a>`);
-
-                $("#myWikiModal").modal("show");
-            };
-
-            marker.addTo(markerCluster);
-            map.addLayer(markerCluster);
+            marker = L.marker([wiki[i].lat, wiki[i].lng], {icon: mapPinIcon}).addTo(markerCluster);
+            context = L.popup()
+            .setLatLng([wiki[i].lat, wiki[i].lng])
+            .setContent(`<p><b>${wiki[i].title}</b></p><p></p><p>${wiki[i].summary}</p><p><a href="https://${wiki[i].wikipediaUrl}">Read more...<a></p><p></p>`)
+            marker.bindPopup(context)
+            map.addLayer(markerCluster)
 
         } else {
             continue; 
@@ -428,23 +612,31 @@ const createEarthQuakes = (array) => {
         let quakeDate = newDate.toLocaleDateString("en-GB", options);
         let quakeDepth = array[i].depth;
 
-        marker = L.marker([array[i].lat, array[i].lng], {
-            icon: earthQuakeIcon
-        }).on("click", createModal);
+            marker = L.marker([array[i].lat, array[i].lng], {
+                icon: earthQuakeIcon
+            }).addTo(markerCluster);
+            context = L.popup()
+            .setLatLng([array[i].lat, array[i].lng])
+            .setContent(`<p><b>Earth quake</sub></p><p>${quakeMagnitude}</b>M<sub>L</p><p>${quakeDate}</p><p>${quakeDepth}km</p>`)
+            marker.bindPopup(context)
+            map.addLayer(markerCluster)
 
-        function createModal(e){
+        // marker = L.marker([array[i].lat, array[i].lng], {
+        //     icon: mapPinIcon
+        // }).on("click", createModal);
 
-            $("#quakeMagnitude").html(`${quakeMagnitude} M<sub>L</sub>`);
-            $("#quakeDate").html(`${quakeDate}`);
-            $("#quakeDepth").html(`${quakeDepth}km`);
+        // function createModal(e){
 
-            $("#myQuakeModal").modal("show");
-        };
+        //     $("#quakeMagnitude").html(`${quakeMagnitude} M<sub>L</sub>`);
+        //     $("#quakeDate").html(`${quakeDate}`);
+        //     $("#quakeDepth").html(`${quakeDepth}km`);
 
-        marker.addTo(markerCluster);
-        map.addLayer(markerCluster);
+        //     $("#myQuakeModal").modal("show");
+        // };
+
+        // marker.addTo(markerCluster);
+        // map.addLayer(markerCluster);
 
     }
 };
-
 

@@ -2,7 +2,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url = "https://api.windy.com/api/webcams/v2/list/country=".$_REQUEST["country"]."/orderby=popularity/limit=20?show=webcams:title,location,url&key=6awvXeIoOKR17rMLCaMhm9MAbgbv1IDL";
+	$url = "https://api.windy.com/api/webcams/v2/list/country=".$_REQUEST["country"]."/orderby=popularity/limit=20?show=webcams:title,location,player&key=6awvXeIoOKR17rMLCaMhm9MAbgbv1IDL";
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -19,7 +19,7 @@
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-	$output["weather"] = $decode;
+	$output["cameras"] = $decode;
 
 	header('Content-Type: application/json; charset=UTF-8');
 
