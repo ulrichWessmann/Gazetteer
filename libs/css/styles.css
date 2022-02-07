@@ -73,6 +73,7 @@ body.preloader-site {
     margin: 11px 7px;
     margin-left: 30px;
     border-radius: 0px 7px 0px 7px;
+    background-color: #FFF;
 }
 
 #markerImage{
@@ -107,9 +108,6 @@ div.modal-content {
     padding-left: 1em
 }
 
-p#condition{
-    text-align: center;
-}
 
 td.tableFont{
     text-align: end;
@@ -160,14 +158,11 @@ div.modal-content.earthquake{
         filter: drop-shadow(5px 5px 5px #222); 
     }
 
-    button.btn-close.weather {
+    /* button.btn-close.weather {
         padding: 0.5rem 0.5rem;
         margin: 0.5rem 0.5rem 0.5rem auto;
-    }
+    } */
 
-    div.modal-content.weather{
-        max-height: 70%;
-    }
     div.leaflet-popup-content {
         margin: 0px 10px;
         line-height: 1em;
@@ -205,10 +200,10 @@ div.modal-content.earthquake{
     div.modal-body.text-black{
         padding-top: 0px;
     }
-    button.btn-close.weather{
+    /* button.btn-close.weather{
         padding: 0.5rem 0.5rem;
         margin: 0.5rem 0.5rem 0.5rem auto;
-    }
+    } */
     div.col.hstack{
         justify-content: center;
     }
@@ -238,3 +233,18 @@ div.modal-content.earthquake{
     max-height: 250px !important;
 }
 
+/* styles added to weather */
+
+
+#weatherImage {
+    display: block;
+    margin: auto;
+    max-width: 120px;
+}
+
+/* span#capital {
+    position: absolute;
+    top: 8px ;
+    left: 16px;
+    font-weight: bold;
+} */

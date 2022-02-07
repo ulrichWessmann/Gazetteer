@@ -78,10 +78,11 @@ $("#myPhotoModal").modal("show")
 L.easyButton( '<i class="fas fa-virus"></i>', function(){
 $("#myCoronaModal").modal("show")
 }).addTo(map);
+let newsbutton;
 
-L.easyButton( '<i class="fas fa-newspaper"></i>', function(){
-$("#myNewsModal").modal("show")
-}).addTo(map);
+// L.easyButton( '<i class="fas fa-newspaper"></i>', function(){
+// $("#myNewsModal").modal("show")
+// }).addTo(map);
 
 // PRELOADER //
 $(window).on("load", () => {
@@ -178,7 +179,7 @@ $("#countrySelection").on("change", ()=> {
         success: function(result) {
             let capitalName = result.data[0].capital[0];
             let restCountryData = result.data
-            console.log(capitalName)
+            
 
             if (result.status.name == "ok") {
                 
@@ -216,17 +217,16 @@ $("#countrySelection").on("change", ()=> {
                 $("#currency").html(`${getCurrency(restCountryData[0].currencies)}`);
 
                 // populate modals with information from API's
-                console.log(restCountryData[0].name.common.replace(/ +/g, ""))
-                getWeather(capitalName);
+                getWeather(capitalLatLng, capitalName);
+                // exchange api exhausted
                 // getExchange(capitalName);
                 getWiki(countryBounds);
-                // getEarthQuakes(countryBounds)
-                // getWindyCameras(countryISO)
-                // getHolidays(countryISO)
-                // getCountryPhotos(restCountryData[0].name.common.replace(/ +/g, ""))
-                // getCovidData()
-                // getNews()
-                console.log(capitalLatLng)
+                getEarthQuakes(countryBounds)
+                getWindyCameras(countryISO)
+                getHolidays(countryISO)
+                getCountryPhotos(restCountryData[0].name.common.replace(/ +/g, ""))
+                getCovidData()
+                getNews()
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -271,28 +271,53 @@ const countryPainter = (countryToFind) => {
 
 }
 
-const getWeather = (capital) => {
+const getWeather = (capital, capitalName) => {
     $.ajax({
     url: "libs/php/getWeather.php",
     type: 'POST',
     dataType: 'json',
     data: {
-        capital: capital
+        capitalLat: capital[0],
+        capitalLng: capital[1],
+
     },
     success: function(result) {
+        
         if (result.status.name == "ok") {
-            weather = result.weather;
+            weather = result.weather.daily;
+            let today = new Date();
 
-            $("#capital").html(`${weather.name}`);
-            $("#condition").html(`${weather.weather[0].description}`);
-            $("#date").html(`${getDate(newDate, { weekday: 'long', day: 'numeric', month: 'long' })}`);
-            $("#temp").html(`${weather.main.temp}&#8451`);
-            $("#feelsLike").html(`${weather.main.feels_like}&#8451`);
-            $("#tempMin").html(`${weather.main.temp_min}&#8451;`);
-            $("#tempMax").html(`${weather.main.temp_max}&#8451;`);
-            $("#pressure").html(`${weather.main.pressure}`);
-            $("#humidity").html(`${weather.main.humidity}&#37;`);
-            $("#weatherImage").attr("src", `libs/images/weather-conditions/${result.weather.weather[0].icon}.png`);
+            // conditional check for main container
+            if($("#weatherForecast")){
+                $("#weatherForecast").remove();
+            }
+            
+            // create container for following 4 day weather information
+            $("#weatherContainer").append('<div class="container-fluid"><div class="row" id="weatherForecast"></div></div>');
+
+            // daily only
+            $("#weatherDate").html(`${getDate(today, { weekday: 'long', day: 'numeric', month: 'long' })}`);
+            $("#capital").html(`${capitalName}`);
+            $("#weatherImage").attr("src", `libs/images/weather-conditions/${weather[0].weather[0].icon}.png`);
+            $("#condition").html(`${weather[0].weather[0].description}`);
+            $("#tempMin").html(`${Math.round(weather[0].temp.max)}&deg;`);
+            $("#tempMax").html(`${Math.round(weather[0].temp.min)}&deg;`);
+
+            let fourday = weather.slice(1, 5)
+
+            fourday.forEach(element => {
+                let unixTimestamp = element.dt;
+                let date = new Date(unixTimestamp * 1000);
+                let prettyDate = getDate(date, { weekday: 'long' });
+                // set day
+                $("#weatherForecast").append(`
+                <div class="col-sm border rounded m-1 text-center">
+                    <p class="text-center fw-bold">${prettyDate}</p>
+                    <p class="text-centre">${Math.round(element.temp.max)}&deg;</p>
+                    <p class="text-centre">${Math.round(element.temp.min)}&deg;</p>
+                </div>
+                `);
+            });
 
         }
     
@@ -425,7 +450,6 @@ const getHolidays = () => {
         success: function(result) {
             
             if (result.status.name == "ok") {
-                var events = []
                 let holidays = result.holidays.holidays
                 if($("#holidayName")){
                     $("#holidayName").remove()
@@ -435,14 +459,6 @@ const getHolidays = () => {
                 holidays.forEach(element => {
                     if(element.public === true){
                         date = new Date(element.date)
-
-                        // //use this
-                        // images.forEach(element => {
-                        //     console.log(element)
-                        //     $("#photos").append("<div id='photosContainer' class='row'></div>");
-                        //     $("#photosContainer").append($())
-                        // })
-                        //
                         let elementName = `<tr><td><b>${element.name}</b></td>`
                         let elementDate = `<td>${getDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}</td></tr>`
                         $("#holidayName").append(elementName + elementDate)
@@ -497,16 +513,6 @@ const getCountryPhotos = (capitalName) => {
                     src: `${images[5].urls.small}`,
                     alt: `${images[5].alt_description}`,
                 });
-                // images.forEach((element, index) => {
-                //     console.log(element)
-                //     console.log(index)
-                //     $(`#photo${[index]}`).attr({
-                //         src: `${images.urls.regular}`,
-                //         title: `${images.description}`,
-                //         alt: `${images.alt_description}`,
-                //         class: "w-100 shadow-1-strong rounded mb-4"
-                //       });
-                // })
             }
         
         },
@@ -529,7 +535,7 @@ const getCovidData = () => {
             // let result.covid.data = covid;
             if (result.status.name == "ok") {
                 let covid = result.covid.data;
-                console.log(covid)
+                
                 $("#totalDeaths").html(covid.latest_data.deaths)
                 $("#todayDeaths").html(covid.today.confirmed)
                 $("#totalConfirmed").html(covid.latest_data.confirmed)
@@ -559,135 +565,103 @@ const getNews = () => {
 
             if (result.status.name == "ok") {
                 let news = result.news.articles
-                if($("#firstColumn")){
-                    $("#firstColumn").remove()
-                    $("#secondColumn").remove()
+                // add news dynamically
+                if($("#firstRow")){
+                    $("#firstRow").remove()
+                    $("#secondRow").remove()
                 }
                 if(result.news.totalResults === 0 || result.news.status === "error"){
 
-                   $("#newsModalLable").html("No news for this country")
+                   if(newsbutton){
+                       map.removeControl(newsbutton)
+                   }
 
                 } else {
+                    // remove old button and create new instance
+                    if(newsbutton){
+                        map.removeControl(newsbutton)
+                    }
+                    newsbutton = L.easyButton( '<i class="fas fa-newspaper"></i>', function(){
+                        $("#myNewsModal").modal("show")
+                        })
+
+                    newsbutton.addTo(map);
                     // create containers dynamically
-                    $("#newsArticles").append('<div class="card-columns d-flex" id="firstColumn">')
-                    $("#newsArticles").append('<div class="card-columns d-flex" id="secondColumn">')
+                    $("#newsArticles").append('<div class="row" id="firstRow"></div>')
+                    $("#newsArticles").append('<div class="row" id="secondRow"></div>')
                     // first card
-                    $("#firstColumn").append(
-                        `<div class="card col-lg-4 col-md-6 col-sm-12">
-                            <img class="card-img-top" ${checkForImage(news[0])}">
-                            <div class="card-body" id>
-                                <h5 class="card-title">${news[0].title}</h5>
-                                <p class="card-text description">${news[0].description}</p>
-                                <p class="card-text link"><small class="text-muted"></small></p>
-                            </div>
-                        </div>`)
+                    $("#firstRow").append(
+                        `<div class="col-lg p-2 m-2 d-flex">
+                        <div class="card">
+                          <img class="card-img-top" ${checkForImage(news[0])}">
+                          <div class="card-body d-flex flex-column justify-content-between" >
+                            <p class="card-title fw-bold ">${news[0].title}</p>
+                            <p class="card-text description ">${news[0].description}</p>
+                            <p class="card-text link"><small class="text-muted"><a href=""${news[0].url}" target="_blank">Read more</a></small></p>
+                          </div>
+                        </div>
+                      </div>`)
 
-                    $("#firstColumn").append(
-                        `<div class="card col-lg-4 col-md-6 col-sm-12">
-                            <img class="card-img-top" ${checkForImage(news[1])}">
-                            <div class="card-body" id>
-                                <h5 class="card-title">${news[1].title}</h5>
-                                <p class="card-text description">${news[1].description}</p>
-                                <p class="card-text link"><small class="text-muted"></small></p>
-                            </div>
-                        </div>`)
+                    $("#firstRow").append(
+                        `<div class="col-lg p-2 m-2 d-flex">
+                        <div class="card">
+                          <img class="card-img-top" ${checkForImage(news[1])}">
+                          <div class="card-body d-flex flex-column justify-content-between" >
+                            <p class="card-title fw-bold">${news[1].title}</p>
+                            <p class="card-text description">${news[1].description}</p>
+                            <p class="card-text link"><small class="text-muted"><a href=""${news[1].url}" target="_blank">Read more</a></small></p>
+                          </div>
+                        </div>
+                      </div>`)
 
-                    $("#firstColumn").append(
-                        `<div class="card col-lg-4 col-md-6 col-sm-12">
-                            <img class="card-img-top" ${checkForImage(news[2])}">
-                            <div class="card-body" id>
-                                <h5 class="card-title">${news[2].title}</h5>
-                                <p class="card-text description">${news[2].description}</p>
-                                <p class="card-text link"><small class="text-muted"></small></p>
-                            </div>
-                        </div>`)
+                    $("#firstRow").append(
+                        `<div class="col-lg p-2 m-2 d-flex">
+                        <div class="card">
+                          <img class="card-img-top" ${checkForImage(news[2])}">
+                          <div class="card-body d-flex flex-column justify-content-between" >
+                            <p class="card-title fw-bold">${news[2].title}</p>
+                            <p class="card-text description">${news[2].description}</p>
+                            <p class="card-text link"><small class="text-muted"><a href=""${news[2].url}" target="_blank">Read more</a></small></p>
+                          </div>
+                        </div>
+                      </div>`)
                         // second column
-                    $("#secondColumn").append(
-                        `<div class="card col-lg-4 col-md-6 col-sm-12">
-                            <img class="card-img-top" ${checkForImage(news[3])}}">
-                            <div class="card-body" id>
-                                <h5 class="card-title">${news[3].title}</h5>
-                                <p class="card-text description">${news[3].description}</p>
-                                <p class="card-text link"><small class="text-muted"></small></p>
-                            </div>
-                        </div>`)
+                    $("#secondRow").append(
+                        `<div class="col p-2 m-2 d-flex">
+                        <div class="card">
+                          <img class="card-img-top" ${checkForImage(news[3])}">
+                          <div class="card-body d-flex flex-column justify-content-between" >
+                            <p class="card-title fw-bold">${news[3].title}</p>
+                            <p class="card-text description">${news[3].description}</p>
+                            <p class="card-text link"><small class="text-muted"><a href=""${news[3].url}" target="_blank">Read more</a></small></p>
+                          </div>
+                        </div>
+                      </div>`)
 
-                    $("#secondColumn").append(
-                        `<div class="card col-lg-4 col-md-6 col-sm-12" id="newsOne">
-                            <img class="card-img-top" ${checkForImage(news[4])}">
-                            <div class="card-body" id>
-                                <h5 class="card-title">${news[4].title}</h5>
-                                <p class="card-text description">${news[4].description}</p>
-                                <p class="card-text link"><small class="text-muted"></small></p>
-                            </div>
-                        </div>`)
+                    $("#secondRow").append(
+                        `<div class="col p-2 m-2 d-flex">
+                        <div class="card">
+                          <img class="card-img-top" ${checkForImage(news[4])}">
+                          <div class="card-body d-flex flex-column justify-content-between" >
+                            <p class="card-title fw-bold">${news[4].title}</p>
+                            <p class="card-text description">${news[4].description}</p>
+                            <p class="card-text link"><small class="text-muted"><a href=""${news[4].url}" target="_blank">Read more</a></small></p>
+                          </div>
+                        </div>
+                      </div>`)
 
-                    $("#secondColumn").append(
-                        `<div class="card col-lg-4 col-md-6 col-sm-12" id="newsOne">
-                            <img class="card-img-top" ${checkForImage(news[5])}">
-                            <div class="card-body" id>
-                                <h5 class="card-title">${news[5].title}</h5>
-                                <p class="card-text description">${news[5].description}</p>
-                                <p class="card-text link"><small class="text-muted"></small></p>
-                            </div>
-                        </div>`)
+                    $("#secondRow").append(
+                        `<div class="col p-2 m-2 d-flex">
+                        <div class="card">
+                          <img class="card-img-top" ${checkForImage(news[5])}">
+                          <div class="card-body d-flex flex-column justify-content-between" >
+                            <p class="card-title fw-bold">${news[5].title}</p>
+                            <p class="card-text description">${news[5].description}</p>
+                            <p class="card-text link"><small class="text-muted"><a href=""${news[5].url}" target="_blank">Read more</a></small></p>
+                          </div>
+                        </div>
+                      </div>`)
                 }
-                
-
-                // if(news[0].urlToImage){
-                //     $("#newsOne img").attr("src", `${news[0].urlToImage}`)   
-                // } else {
-                //     $("#newsOne img").attr("src", `""`)
-                // }
-                // if(news[1].urlToImage){
-                //     $("#newsTwo img").attr("src", `${news[1].urlToImage}`)   
-                // } else {
-                //     $("#newsTwo img").attr("src", `""`)
-                // }
-                // if(news[2].urlToImage){
-                //     $("#newsThree img").attr("src", `${news[2].urlToImage}`)   
-                // } else {
-                //     $("#newsThree img").attr("src", `""`)
-                // }
-                // if(news[3].urlToImage){
-                //     $("#newsFour img").attr("src", `${news[3].urlToImage}`)   
-                // } else {
-                //     $("#newsFour img").attr("src", `""`)
-                // }
-                // if(news[4].urlToImage){
-                //     $("#newsFive img").attr("src", `${news[4].urlToImage}`)   
-                // } else {
-                //     $("#newsFive img").attr("src", `""`)
-                // }
-                // if(news[5].urlToImage){
-                //     $("#newsSix img").attr("src", `${news[5].urlToImage}`)   
-                // } else {
-                //     $("#newsSix img").attr("src", `""`)
-                // }
-                
-                // $("#newsOne h5").html(`${news[0].title}`)
-                // $("#newsOne p.description").html(`${news[0].description}`)
-                // $("#newsOne p.link").html(`<a href="${news[0].url}" target="_blank">Read more...<a>`)
-                // // two
-                // $("#newsTwo h5").html(`${news[1].title}`)
-                // $("#newsTwo p.description").html(`${news[1].description}`)
-                // $("#newsTwo p.link").html(`<a href="${news[1].url}" target="_blank">Read more...<a>`)
-                // // three
-                // $("#newsThree h5").html(`${news[2].title}`)
-                // $("#newsThree p.description").html(`${news[2].description}`)
-                // $("#newsThree p.link").html(`<a href="${news[2].url}" target="_blank">Read more...<a>`)
-                // // four
-                // $("#newsFour h5").html(`${news[3].title}`)
-                // $("#newsFour p.description").html(`${news[3].description}`)
-                // $("#newsFour p.link").html(`<a href="${news[3].url}" target="_blank">Read more...<a>`)
-                // // five
-                // $("#newsFive h5").html(`${news[4].title}`)
-                // $("#newsFive p.description").html(`${news[4].description}`)
-                // $("#newsFive p.link").html(`<a href="${news[4].url}" target="_blank">Read more...<a>`)
-                // // six
-                // $("#newsSix h5").html(`${news[5].title}`)
-                // $("#newsSix p.description").html(`${news[5].description}`)
-                // $("#newsSix p.link").html(`<a href="${news[5].url}" target="_blank">Read more...<a>`)
             }
         
         },
@@ -773,24 +747,6 @@ const createEarthQuakes = (array) => {
             .setContent(`<p><b>Strength:</b> ${quakeMagnitude}</b>M<sub>L</p><p><b>Depth:</b> ${quakeDepth}km</p><p>${quakeDate}</p>`)
             marker.bindPopup(context)
             map.addLayer(markerCluster)
-
-            
-        // marker = L.marker([array[i].lat, array[i].lng], {
-        //     icon: mapPinIcon
-        // }).on("click", createModal);
-
-        // function createModal(e){
-
-        //     $("#quakeMagnitude").html(`${quakeMagnitude} M<sub>L</sub>`);
-        //     $("#quakeDate").html(`${quakeDate}`);
-        //     $("#quakeDepth").html(`${quakeDepth}km`);
-
-        //     $("#myQuakeModal").modal("show");
-        // };
-
-        // marker.addTo(markerCluster);
-        // map.addLayer(markerCluster);
-
     }
 };
 
@@ -799,7 +755,7 @@ const checkForImage = (array) => {
     if(array.urlToImage) {
         imageTag = `src="${array.urlToImage}" alt="${array.description}"`;
     } else {
-        imageTag = 'src="" alt="No image to display"';
+        imageTag = 'src="libs/images/placeholder.jpg" alt="Place holder image"';
     }
     return imageTag;
 };

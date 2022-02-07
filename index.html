@@ -25,7 +25,7 @@
 
 </head>
     <body>
-
+    <!-- preloader -->
     <div class="preloader-wrapper">
       <div class="preloader">
           <img id="preloader-img" src="libs/images/1489.gif" alt="NILA">
@@ -81,88 +81,41 @@
         </div>
       </div>
     </div>
+
     <!-- weather modal -->
     <div class="modal fade " id="myModalWeather" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content weather">
+            <div class="modal-header border-0">
             <h5 class="modal-title text-black fw-bold " id="exampleModalLabel"><span id="country"></span></h5>
               <button type="button" class="btn-close weather" data-bs-dismiss="modal" aria-label="Close" data-backdrop="false"></button>
-            
+            </div>
             <div class="modal-body text-black">
-              <div class="container-fluid">
+              <div class="container-fluid" id="weatherContainer">
         
-                <!-- first row -->
                   <div class="row "> 
                     <div class="col">
-                    </div>
-                    <div class="col hstack fw-bold">
-                      <p class="text-center">Weather in <span id="capital"></span></p>
-                    </div>
-                    <div class="col">
-                    </div>
-                  </div>
-                  <!-- second row -->
-                  <div class="row "> 
-                    <div class="col">
-                    </div>
-                    <div class="col">
+                      <h3 class="text-center d-block" id="capital"></h3> 
+                      <div>
                       <img id="weatherImage" src="">
+                      </div>
                     </div>
-                    <div class="col">
-                    </div>
-                  </div>
-                  <!-- third row -->
-                  <div class="row border-bottom">
-                    <div class="col">
-                    </div>
-                    <div class="col hstack">
-                      <p id="condition"></p>
-                    </div>
-                    <div class="col">
-                    </div>
-                  </div>
+                    <div class="col text-right">
+                      <p class="fw-bold" id="weatherDate">Date</p>
+                      <p id="tempMax">Max</p>
+                      <p id="tempMin">Min</p>
+                      <p id="condition">conditions</p>
 
-                  
-
-                  <table class="table text-black table-borderless hs">
-                    <tbody>
-                      <tr>
-                        <td class="fw-bold">Date:</td>
-                        <td class="tableFont" id="date"></td>
-                      </tr>
-                      <tr>
-                        <td class="fw-bold">Temperature:</td>
-                        <td class="tableFont" id="temp"></td>
-                      </tr>
-                      <tr>
-                        <td class="fw-bold">Feels Like:</td>
-                        <td class="tableFont" id="feelsLike"></td>
-                      </tr>
-                      <tr>
-                        <td class="fw-bold">High:</td>
-                        <td class="tableFont" id="tempMax"></td>
-                      </tr>
-                      <tr>
-                        <td class="fw-bold">Low:</td>
-                        <td class="tableFont" id="tempMin"></td>
-                      </tr>
-                      <tr>
-                        <td class="fw-bold">Pressure:</td>
-                        <td class="tableFont" id="pressure"></td>
-                      </tr>
-                      <tr>
-                        <td class="fw-bold">Humidity:</td>
-                        <td class="tableFont" id="humidity"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-      
+                    </div>
+                  </div>       
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- calendar model -->
+
+      <!-- holiday model -->
+
       <div id="myCaleandarModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content" id="holidaySize">
@@ -172,7 +125,6 @@
             </div>
               <div class="modal-body">
               <table id="getTable" class="table text-black table-borderless hs ">
-                <!-- <tbody id="holidayName"></tbody class=""> -->
               </table>
               </div>
             </div>
@@ -185,7 +137,6 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="photoContainer">
           <div class="modal-content">
             <div class="modal-header no-border">
-              <h3></h3>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-backdrop="false"></button> 
             </div>
             <div class="modal-body">
@@ -282,16 +233,18 @@
       </div>
 
       <!-- news modal -->
+
       <div class="modal fade" id="myNewsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable container-fluid" id="newsModal">
-          <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+          <div class="modal-content d-flex-row">
             <div class="modal-header">
-              <h5 class="modal-title text-black fw-bold " id="newsModalLable"></h5>
+            <h5 class="modal-title text-black fw-bold " id="newsModalLable"></h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-backdrop="false"></button>
             </div>
-            <div class="modal-body" id="newsArticles">
-      
-              </table>
+            <div class="modal-body text-black">
+              <div class="container" id="newsArticles">                  
+                
+              </div>
             </div>
           </div>
         </div>
