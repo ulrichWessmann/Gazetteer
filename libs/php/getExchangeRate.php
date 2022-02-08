@@ -12,7 +12,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

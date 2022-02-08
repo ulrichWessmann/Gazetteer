@@ -2,7 +2,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url = "https://api.windy.com/api/webcams/v2/list/country=".$_REQUEST["country"]."/orderby=popularity/limit=20?show=webcams:title,location,player&key=6awvXeIoOKR17rMLCaMhm9MAbgbv1IDL";
+	$url = "https://api.windy.com/api/webcams/v2/list/country=".$_POST["country"]."/orderby=popularity/limit=20?show=webcams:title,location,player&key=6awvXeIoOKR17rMLCaMhm9MAbgbv1IDL";
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -13,7 +13,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

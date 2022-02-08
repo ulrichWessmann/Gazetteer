@@ -5,6 +5,13 @@
 	$result = file_get_contents("../data/countryBorders.geo.json");
 
 	$decode = json_decode($result,true);
+
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
+
 	$countries = [];
 	
 	foreach ($decode["features"] as $object) {

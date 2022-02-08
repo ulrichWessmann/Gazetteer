@@ -2,7 +2,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url = "https://api.unsplash.com/search/photos?page=1&query=".$_REQUEST["capital"]."&client_id=uz70luD9H4Yg4ajj8vOCtLnUp83moNqxmRuL6jIis5o";
+	$url = "https://api.unsplash.com/search/photos?page=1&query=".$_POST["capital"]."&client_id=uz70luD9H4Yg4ajj8vOCtLnUp83moNqxmRuL6jIis5o";
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -13,7 +13,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+	
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

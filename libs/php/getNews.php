@@ -2,7 +2,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url = "https://newsapi.org/v2/top-headlines?country=".$_REQUEST["country"]."&apiKey=7ab1d5acc0fd409f83910f0a47b40985&sortBy=popularity&language=en";
+	$url = "https://newsapi.org/v2/top-headlines?country=".$_POST["country"]."&apiKey=7ab1d5acc0fd409f83910f0a47b40985&sortBy=popularity&language=en";
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -13,7 +13,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

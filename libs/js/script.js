@@ -596,7 +596,6 @@ const getNews = () => {
                           <img class="card-img-top" ${checkForImage(news[0])}">
                           <div class="card-body d-flex flex-column justify-content-between" >
                             <p class="card-title fw-bold ">${news[0].title}</p>
-                            <p class="card-text description ">${news[0].description}</p>
                             <p class="card-text link"><small class="text-muted"><a href=""${news[0].url}" target="_blank">Read more</a></small></p>
                           </div>
                         </div>
@@ -608,7 +607,6 @@ const getNews = () => {
                           <img class="card-img-top" ${checkForImage(news[1])}">
                           <div class="card-body d-flex flex-column justify-content-between" >
                             <p class="card-title fw-bold">${news[1].title}</p>
-                            <p class="card-text description">${news[1].description}</p>
                             <p class="card-text link"><small class="text-muted"><a href=""${news[1].url}" target="_blank">Read more</a></small></p>
                           </div>
                         </div>
@@ -620,7 +618,6 @@ const getNews = () => {
                           <img class="card-img-top" ${checkForImage(news[2])}">
                           <div class="card-body d-flex flex-column justify-content-between" >
                             <p class="card-title fw-bold">${news[2].title}</p>
-                            <p class="card-text description">${news[2].description}</p>
                             <p class="card-text link"><small class="text-muted"><a href=""${news[2].url}" target="_blank">Read more</a></small></p>
                           </div>
                         </div>
@@ -632,7 +629,6 @@ const getNews = () => {
                           <img class="card-img-top" ${checkForImage(news[3])}">
                           <div class="card-body d-flex flex-column justify-content-between" >
                             <p class="card-title fw-bold">${news[3].title}</p>
-                            <p class="card-text description">${news[3].description}</p>
                             <p class="card-text link"><small class="text-muted"><a href=""${news[3].url}" target="_blank">Read more</a></small></p>
                           </div>
                         </div>
@@ -644,7 +640,6 @@ const getNews = () => {
                           <img class="card-img-top" ${checkForImage(news[4])}">
                           <div class="card-body d-flex flex-column justify-content-between" >
                             <p class="card-title fw-bold">${news[4].title}</p>
-                            <p class="card-text description">${news[4].description}</p>
                             <p class="card-text link"><small class="text-muted"><a href=""${news[4].url}" target="_blank">Read more</a></small></p>
                           </div>
                         </div>
@@ -656,7 +651,6 @@ const getNews = () => {
                           <img class="card-img-top" ${checkForImage(news[5])}">
                           <div class="card-body d-flex flex-column justify-content-between" >
                             <p class="card-title fw-bold">${news[5].title}</p>
-                            <p class="card-text description">${news[5].description}</p>
                             <p class="card-text link"><small class="text-muted"><a href=""${news[5].url}" target="_blank">Read more</a></small></p>
                           </div>
                         </div>

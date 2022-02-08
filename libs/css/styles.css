@@ -42,16 +42,6 @@ body.preloader-site {
 }
 
 /*  leaflet controls*/
-.leaflet-top.leaflet-left{
-    top: 4em;
-}
-.leaflet-touch .leaflet-bar button {
-    font-size: 17px;
-    border-radius: 50%;
-}
-.leaflet-bar.easy-button-container.leaflet-control {
-    border-radius: 50%;
-}
 
 /* icons */
 

@@ -1,12 +1,10 @@
 <?php
 
-	// get country from rest countries
 
 	$executionStartTime = microtime(true);
 
-	$code = $_REQUEST["country"];
 
-	$url="https://restcountries.com/v3.1/alpha/".$code;
+	$url="https://restcountries.com/v3.1/alpha/".$_POST["country"];
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -17,7 +15,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

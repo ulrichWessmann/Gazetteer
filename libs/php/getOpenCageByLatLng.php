@@ -4,7 +4,7 @@
 
 	$executionStartTime = microtime(true);
 	
-	$url='https://api.opencagedata.com/geocode/v1/geojson?q='.$_REQUEST["lat"].'%2C'.$_REQUEST["lng"].'&key='.$key.'&pretty=1&no_annotations=1';
+	$url='https://api.opencagedata.com/geocode/v1/geojson?q='.$_POST["lat"].'%2C'.$_POST["lng"].'&key='.$key.'&pretty=1&no_annotations=1';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -15,7 +15,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

@@ -2,7 +2,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url = "http://api.geonames.org/wikipediaBoundingBoxJSON?north=".$_REQUEST["north"]."&south=".$_REQUEST["south"]."&east=".$_REQUEST["east"]."&west=".$_REQUEST["west"]."&username=sa3kes";
+	$url = "http://api.geonames.org/wikipediaBoundingBoxJSON?north=".$_POST["north"]."&south=".$_POST["south"]."&east=".$_POST["east"]."&west=".$_POST["west"]."&username=sa3kes";
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -13,7 +13,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

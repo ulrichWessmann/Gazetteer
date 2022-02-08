@@ -4,7 +4,7 @@
 
 	$key = "06ba3a69-6342-426f-857b-dbf0dcf3bf80";
 	
-	$url = "https://holidayapi.com/v1/holidays?pretty&key=06ba3a69-6342-426f-857b-dbf0dcf3bf80&country=".$_REQUEST["country"]."&year=2021";
+	$url = "https://holidayapi.com/v1/holidays?pretty&key=06ba3a69-6342-426f-857b-dbf0dcf3bf80&country=".$_POST["country"]."&year=2021";
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -15,7 +15,12 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);	
+	$decode = json_decode($result,true);
+	
+	if(json_last_error() != ""){
+		echo "JSON error";
+		exit();
+	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
