@@ -19,6 +19,7 @@ $output;
 foreach ($decode["features"] as $object) {
     if($object["properties"]["iso_a2"] == $country){
         $output = $object;
+        break;
     }
 }
 $output['status']['code'] = "200";
