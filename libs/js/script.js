@@ -203,7 +203,7 @@ $("#countrySelection").on("change", ()=> {
                 .setContent(`<p ${inlineStyle}>${result.data[0].capital[0]}</p><p ${inlineStyle}>${capitalLat}, ${capitalLng}</span></p>`)
                 .openOn(map);
 
-                    markers.bindPopup(capitalPopup).openPopup();
+                markers.bindPopup(capitalPopup).openPopup();
 
                 // get countries currency
                 Object.keys(restCountryData[0].currencies).forEach(element=> {
@@ -425,7 +425,7 @@ const getWindyCameras = () => {
                     .setContent(`<p><b>${cameras[i].title}</b></p><p><iframe src="${cameras[i].player.day.embed}" ></p>`)
                     marker.bindPopup(context, {
                         minWidth: 320
-                        })
+                    })
                     map.addLayer(markerCluster)
                 }
             }
@@ -464,9 +464,7 @@ const getHolidays = () => {
                         $("#holidayName").append(elementName + elementDate)
                     }
                 });
-
             }
-        
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus);
@@ -486,8 +484,8 @@ const getCountryPhotos = (capitalName) => {
         success: function(result) {
             
             if (result.status.name == "ok") {
+                let images = result.images.results;
 
-                let images = result.images.results
                 $("#photo1").attr({
                     src: `${images[0].urls.small}`,
                     alt: `${images[0].alt_description}`,
@@ -513,8 +511,7 @@ const getCountryPhotos = (capitalName) => {
                     src: `${images[5].urls.small}`,
                     alt: `${images[5].alt_description}`,
                 });
-            }
-        
+            }  
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus);
@@ -733,14 +730,14 @@ const createEarthQuakes = (array) => {
         let quakeDate = newDate.toLocaleDateString("en-GB", options);
         let quakeDepth = array[i].depth;
 
-            marker = L.marker([array[i].lat, array[i].lng], {
-                icon: earthQuakeIcon
-            }).addTo(markerCluster);
-            context = L.popup()
-            .setLatLng([array[i].lat, array[i].lng])
-            .setContent(`<p><b>Strength:</b> ${quakeMagnitude}</b>M<sub>L</p><p><b>Depth:</b> ${quakeDepth}km</p><p>${quakeDate}</p>`)
-            marker.bindPopup(context)
-            map.addLayer(markerCluster)
+        marker = L.marker([array[i].lat, array[i].lng], {
+            icon: earthQuakeIcon
+        }).addTo(markerCluster);
+        context = L.popup()
+        .setLatLng([array[i].lat, array[i].lng])
+        .setContent(`<p><b>Strength:</b> ${quakeMagnitude}</b>M<sub>L</p><p><b>Depth:</b> ${quakeDepth}km</p><p>${quakeDate}</p>`)
+        marker.bindPopup(context)
+        map.addLayer(markerCluster)
     }
 };
 
