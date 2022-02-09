@@ -9,7 +9,7 @@ $result = file_get_contents("../data/countryBorders.geo.json");
 $decode = json_decode($result,true);
 
 if(json_last_error() != ""){
-    echo "error";
+    echo "invalid JSON";
     exit();
 }
 
@@ -22,6 +22,7 @@ foreach ($decode["features"] as $object) {
         break;
     }
 }
+
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";

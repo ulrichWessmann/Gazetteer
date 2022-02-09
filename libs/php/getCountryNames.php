@@ -8,7 +8,7 @@
 
 
 	if(json_last_error() != ""){
-		echo "JSON error";
+		echo "invalid JSON";
 		exit();
 	}
 
